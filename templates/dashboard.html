@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Exam Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/chart.js' %}"></script>
+</head>
+
+<body class="min-h-screen bg-[#fcfaf7] font-rubik flex">
+    <!-- Sidebar -->
+    <aside class="w-[320px] bg-[#fcfaf7] min-h-screen sticky top-0 flex flex-col">
+        <div class="p-4">
+            <h1 class="font-medium text-base text-[#1c170d]">Exam Portal</h1>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="flex-1 px-4">
+            <div class="space-y-2">
+                <a href="/dashboard/" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f5ede8] text-[#1c170d]">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </a>
+
+                <a href="#"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">My Exams</span>
+                </a>
+
+                <a href="#"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Results</span>
+                </a>
+
+                <a href="#"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="font-medium text-sm">Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Bottom Section -->
+        <div class="p-4 space-y-4">
+            <!-- Start Exam Button -->
+            <button
+                class="w-full bg-[#f2960d] text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-[#c3824e] transition-colors">
+                Start Exam
+            </button>
+
+            <!-- Profile Section -->
+            <div class="flex items-center gap-3 px-3 py-2">
+                <a href="{% url 'logout' %}"
+                    class="flex items-center gap-3 text-[#1c170d] hover:text-[#f2960d] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+    <!--
+     Main Content Wrapper
+    <div class="flex-1">
+         Top Navigation 
+        <nav class="bg-white shadow-sm">
+            <div class="px-8 flex justify-end h-16">
+                <div class="flex items-center">
+                    {% if request.user.studentprofile.first_name and request.user.studentprofile.last_name %}
+                    <span class="text-[#1c170d]">{{ request.user.studentprofile.first_name }} {{
+                        request.user.studentprofile.last_name }}</span>
+                    {% else %}
+                    <span class="text-[#1c170d]">User</span>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+        <div class="flex items-center space-x-4">
+            {% if request.user.studentprofile.first_name and request.user.studentprofile.last_name %}
+            <span class="text-[#616161]">Hi, {{ request.user.studentprofile.first_name }} {{
+                request.user.studentprofile.last_name }}</span>
+            {% else %}
+            <span class="text-[#616161]">Hi, User</span>
+            {% endif %}
+            <a href="{% url 'logout' %}" class="text-[#f99d27] hover:text-[#c3824e] font-medium">Logout</a>
+        </div>
+    </div>
+    </div>
+    </nav> 
+-->
+    <!-- Main Content -->
+    <main class="p-8">
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h1 class="text-[32px] font-bold text-[#1c170d]">Dashboard</h1>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="border border-[#e8decf] rounded-lg p-6">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-medium text-[#1c170d]">Total Tests</span>
+                    <span class="text-2xl font-bold text-[#1c170d]">{{ total_exams_taken }}</span>
+                    <span class="text-base font-medium text-[#08870f]">+10%</span>
+                </div>
+            </div>
+            <div class="border border-[#e8decf] rounded-lg p-6">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-medium text-[#1c170d]">Average Score</span>
+                    <span class="text-2xl font-bold text-[#1c170d]">{{ average_score|floatformat:1 }}%</span>
+                    <span class="text-base font-medium text-[#e80f08]">-5%</span>
+                </div>
+            </div>
+            <div class="border border-[#e8decf] rounded-lg p-6">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-medium text-[#1c170d]">Completion Rate</span>
+                    <span class="text-2xl font-bold text-[#1c170d]">92%</span>
+                    <span class="text-base font-medium text-[#08870f]">+2%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Test Scores Chart -->
+            <div class="border border-[#e8decf] rounded-lg p-6">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-medium text-[#1c170d]">Test Scores Over Time</span>
+                    <span class="text-[32px] font-bold text-[#1c170d]">75%</span>
+                    <div class="flex gap-1">
+                        <span class="text-base text-[#9c7a4a]">Last 30 Days</span>
+                        <span class="text-base font-medium text-[#08870f]">+5%</span>
+                    </div>
+                    <div class="h-[180px] mt-4">
+                        <canvas id="scoresChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subject Completion Chart -->
+            <div class="border border-[#e8decf] rounded-lg p-6">
+                <div class="flex flex-col gap-2">
+                    <span class="text-base font-medium text-[#1c170d]">Test Completion by Subject</span>
+                    <span class="text-[32px] font-bold text-[#1c170d]">85%</span>
+                    <div class="flex gap-1">
+                        <span class="text-base text-[#9c7a4a]">Last 30 Days</span>
+                        <span class="text-base font-medium text-[#08870f]">+3%</span>
+                    </div>
+                    <div class="h-[180px] mt-4">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Exams -->
+        <section class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-[#1c170d]">Upcoming Exams</h2>
+                <a href="#" class="text-sm font-medium text-[#f2960d] hover:text-[#c3824e] transition-colors">View
+                    All</a>
+            </div>
+            {% if upcoming_exams %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for exam in upcoming_exams %}
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <div class="flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="font-semibold text-base text-[#1c170d]">{{ exam.name }}</h3>
+                            <span class="text-sm font-medium text-[#1c170d] opacity-60">{{ exam.duration }}</span>
+                        </div>
+                        <div class="flex-grow space-y-2 text-sm text-[#1c170d] opacity-60 mb-4">
+                            <p><span class="font-medium">Total Marks:</span> {{ exam.total_marks }}</p>
+                            {% if exam.description %}
+                            <p>{{ exam.description|truncatewords:20 }}</p>
+                            {% endif %}
+                        </div>
+                        <button
+                            class="w-full bg-[#f2960d] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors">
+                            Start Exam
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-[#1c170d] opacity-60">No upcoming exams available.</p>
+            {% endif %}
+        </section>
+
+        <!-- Recent Attempts -->
+        <section>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-[#1c170d]">Recent Activity</h2>
+                <a href="#" class="text-sm font-medium text-[#f2960d] hover:text-[#c3824e] transition-colors">View
+                    All</a>
+            </div>
+            {% if recent_attempts %}
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="text-left text-sm font-medium text-[#1c170d]">
+                            <th class="px-6 py-4">Exam Name</th>
+                            <th class="px-6 py-4">Attempt</th>
+                            <th class="px-6 py-4">Score</th>
+                            <th class="px-6 py-4">Date</th>
+                            <th class="px-6 py-4">Time Taken</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#f5ede8]">
+                        {% for attempt in recent_attempts %}
+                        <tr class="text-sm hover:bg-[#fcfaf7]">
+                            <td class="px-6 py-4 text-[#1c170d]">{{ attempt.exam.name }}</td>
+                            <td class="px-6 py-4 text-[#1c170d] opacity-60">{{ attempt.attempt_number }}</td>
+                            <td
+                                class="px-6 py-4 font-medium {% if attempt.score >= 70 %}text-green-600{% else %}text-[#f2960d]{% endif %}">
+                                {{ attempt.score|floatformat:1 }}%
+                            </td>
+                            <td class="px-6 py-4 text-[#1c170d] opacity-60">{{ attempt.date_taken|date:"M d, Y" }}</td>
+                            <td class="px-6 py-4 text-[#1c170d] opacity-60">{{ attempt.time_taken }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-[#1c170d] opacity-60">No recent attempts found.</p>
+            {% endif %}
+        </section>
+    </main>
+    </div>
+</body>
+
+</html>
