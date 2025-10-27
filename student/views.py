@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
 from django.db.models import Count, Avg
+from django.contrib.auth import logout
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import UserSerializer
@@ -74,3 +77,25 @@ class DashboardView(TemplateView):
         context['average_score'] = attempts.aggregate(Avg('score'))['score__avg'] or 0
         
         return context
+
+
+def custom_logout_view(request):
+    """
+    Custom logout view that handles both JWT tokens and sessions.
+    Clears JWT cookies and session data, then redirects to login page.
+    """
+    # Logout the user from Django's session
+    logout(request)
+    
+    # Create response to redirect to login page
+    response = HttpResponseRedirect(reverse('login'))
+    
+    # Clear JWT cookies
+    response.delete_cookie('jwt')
+    response.delete_cookie('access_token')
+    response.delete_cookie('refresh_token')
+    
+    # Clear any other authentication cookies
+    response.delete_cookie('sessionid')
+    
+    return response

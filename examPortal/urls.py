@@ -19,7 +19,7 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 from django.contrib.auth.views import LogoutView
 from api.views import UserCreateView
-from student.views import DashboardView
+from student.views import DashboardView, custom_logout_view
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -31,6 +31,6 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework.urls')),
-    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('logout/', custom_logout_view, name='logout'),
 ]
 

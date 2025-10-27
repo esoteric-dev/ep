@@ -75,7 +75,7 @@
 
             <!-- Profile Section -->
             <div class="flex items-center gap-3 px-3 py-2">
-                <a href="{% url 'logout' %}"
+                <a href="{% url 'logout' %}" onclick="handleLogout()"
                     class="flex items-center gap-3 text-[#1c170d] hover:text-[#f2960d] transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -257,6 +257,19 @@
         </section>
     </main>
     </div>
+
+    <script>
+        function handleLogout() {
+            // Clear localStorage tokens
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            
+            // Clear any other stored data
+            localStorage.clear();
+            
+            // The page will redirect to login via the server-side logout view
+        }
+    </script>
 </body>
 
 </html>
