@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Online Examination</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2563eb", // Using a standard blue for primary actions
+            "background-light": "#f8fafc",
+            "background-dark": "#0f172a",
+            "surface-light": "#ffffff",
+            "surface-dark": "#1e293b",
+            "text-light": "#020617",
+            "text-dark": "#e2e8f0",
+            "subtext-light": "#475569",
+            "subtext-dark": "#94a3b8",
+            "border-light": "#e2e8f0",
+            "border-dark": "#334155",
+            "green-light": "#16a34a",
+            "green-dark": "#22c55e",
+            "orange-light": "#f97316",
+            "orange-dark": "#fb923c",
+            "purple-light": "#9333ea",
+            "purple-dark": "#a855f7",
+            "red-light": "#dc2626",
+            "red-dark": "#ef4444",
+            "gray-light": "#e5e7eb",
+            "gray-dark": "#374151"
+          },
+          fontFamily: {
+            display: ["Roboto", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.375rem",
+          },
+        },
+      },
+    };
+  </script>
+<style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display">
+<div class="min-h-screen flex flex-col" id="exam-container">
+<header class="bg-surface-light dark:bg-surface-dark shadow-md border-b border-border-light dark:border-border-dark">
+<div class="container mx-auto px-4 py-2 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<img alt="Organization Logo 1" class="h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLeU-W6U39nPtSL-X_FfxPcCwqpv1vLhoT_cff1JOSBCYt0G8orO04u3RZ75WYm35wdvTsnCE5y-fzud7f4grbKLOgxApbQtuTNcYPnPFibTVHPhVZ6A4tkGdVuGKqILGFxHu6dwAa4O-e6ds0OaEwpM0Y85wYOe4V8XHQ72NDFm1I5BSUExJoN4gwUQzCA5iu_kua8tWoMxA_LuUQvHu7tSWcgH-pmr8dL4BOvNA8axglDNlMEWIZ9Fwq6bs51O9SCVyxglsozEo"/>
+<img alt="National Testing Agency Logo" class="h-12" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQkPAtPhTZ74YxfS6-XBLt3-wRUz9iLW6aNdNTo5tUNbCmk7nV2f47shAd2m2u4uSpTHDW6g7DGzbhHuL2N2o9oZ4tSNV9cywSvt1CX_kAbyvyQsD9UQBBJcXFbnbkh73C8CKDhLhOtv2djW3QICRiBsaMk072RJ3okluPtlyz6gY7_6iY7XhMDZzsMi9iDXYoXE_6FqMqdhuZ2j5szGrOl0nRfrfG916slA5I5jr-GgVJt0Zways1uStDhEPaRMInyG4vljZy4lI"/>
+<div class="h-10 w-px bg-border-light dark:bg-border-dark hidden md:block"></div>
+<img alt="Ministry of Education Logo" class="h-12 hidden md:block" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoCupvnEKRsEWhsXY7bjOTMWEjzpCOFs5yog8CZLW_LbhSVhlSrHMMihRa5EpRHoV0g7FCRq_77cUmk0geHEnWO-JtpLxOKix4Be5ghpzc8jI0UsZsIKQLOqp2gUHnRVlthn99e6KjURL4_Q2wfMDkzN9jbKdY7y6LgNM316ieQ3-6obPZVTWdc_LfFd2-iGyrA7-Ancq2aKetN3Ie2L9H-uw1jgaMxylTLloaHHiVmiy3AW7sINGtE8agzy6gJcEqsxAe4ZY0yZQ"/>
+</div>
+<div class="flex items-center gap-4">
+<img alt="Azadi Ka Amrit Mahotsav Logo" class="h-12 hidden sm:block" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd1rtv8GETx3YnKxLrfnxkBvSW32Vgqk2PmMDbFEuquxCDArNI0zCC2V2z376_k5RNNmDBLwRdhHyVp6-MWPuam89DgxQYZLYVs4bPPJs57-CK4TZpf-2_uWD4baQyRARU1obfRD3pwqnMtwNquvflR8k1ULtBzyMoR1g7xtPUN3sCP6zLYCs-mYdSFR894RzYfkXju-V7sgEblQxx9-E-jgY94dZPJDXDEXT6OVqOQUyK7_dd_0ySlhfKgUh5fJF6YC4KWIuf6x4"/>
+</div>
+</div>
+</header>
+<main class="flex-grow container mx-auto p-4 flex flex-col lg:flex-row gap-4">
+<div class="flex-grow bg-surface-light dark:bg-surface-dark rounded-lg shadow p-6 flex flex-col">
+<div class="flex-grow">
+<div class="flex items-start gap-4 mb-6 pb-4 border-b border-border-light dark:border-border-dark">
+<div class="p-3 bg-gray-light dark:bg-gray-dark rounded-full">
+<span class="material-symbols-outlined text-3xl text-subtext-light dark:text-subtext-dark">person</span>
+</div>
+<div class="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1 text-sm">
+<span class="font-medium text-subtext-light dark:text-subtext-dark">Candidate Name</span>
+<span class="font-bold">[Your Name]</span>
+<span class="font-medium text-subtext-light dark:text-subtext-dark">Exam Name</span>
+<span class="font-bold">JEE Main</span>
+<span class="font-medium text-subtext-light dark:text-subtext-dark">Subject Name</span>
+<span class="font-bold">4050367 B PLANNING 6th JAN 2020 Shift 2 Set 2</span>
+<span class="font-medium text-subtext-light dark:text-subtext-dark">Remaining Time</span>
+<span class="font-bold text-white bg-primary px-2 py-1 rounded">02:59:48</span>
+</div>
+</div>
+<div class="mb-6">
+<div class="flex justify-between items-center mb-4">
+<h2 class="text-lg font-bold">Question 1:</h2>
+<button class="flex items-center gap-2 text-primary">
+                View in:
+                <select class="border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark rounded text-sm p-1">
+<option>English</option>
+<option>Hindi</option>
+</select>
+</button>
+</div>
+<div class="space-y-4 text-base">
+<p>If A = {1, 2, 3, 4}, then the number of functions on the set A, which are not one - one, is :</p>
+<div class="space-y-3">
+<p class="font-medium">Options:</p>
+<label class="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+<input class="form-radio text-primary focus:ring-primary" name="option" type="radio"/>
+<span>1. 232</span>
+</label>
+<label class="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+<input class="form-radio text-primary focus:ring-primary" name="option" type="radio"/>
+<span>2. 240</span>
+</label>
+<label class="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+<input class="form-radio text-primary focus:ring-primary" name="option" type="radio"/>
+<span>3. 256</span>
+</label>
+<label class="flex items-center gap-3 p-3 border border-border-light dark:border-border-dark rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+<input class="form-radio text-primary focus:ring-primary" name="option" type="radio"/>
+<span>4. 210</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-border-light dark:border-border-dark">
+<div class="flex flex-wrap items-center justify-between gap-2">
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 bg-green-light dark:bg-green-dark text-white font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">SAVE &amp; NEXT</button>
+<button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">CLEAR</button>
+<button class="px-4 py-2 bg-orange-light dark:bg-orange-dark text-white font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">SAVE &amp; MARK FOR REVIEW</button>
+<button class="px-4 py-2 bg-primary text-white font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">MARK FOR REVIEW &amp; NEXT</button>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">&lt;&lt; BACK</button>
+<button class="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-text-light dark:text-text-dark font-semibold rounded-md shadow-sm hover:opacity-90 transition-opacity text-sm">NEXT &gt;&gt;</button>
+</div>
+</div>
+</div>
+</div>
+<div class="w-full lg:w-80 lg:flex-shrink-0 bg-surface-light dark:bg-surface-dark rounded-lg shadow p-4 flex flex-col">
+<div class="flex-grow overflow-y-auto">
+<div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-4 text-xs">
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 flex items-center justify-center font-bold bg-gray-300 dark:bg-gray-500 rounded-md">99</span>
+<span>Not Visited</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 flex items-center justify-center font-bold text-white bg-red-light dark:bg-red-dark rounded-md">1</span>
+<span>Not Answered</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 flex items-center justify-center font-bold text-white bg-green-light dark:bg-green-dark rounded-md">0</span>
+<span>Answered</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-7 h-7 flex items-center justify-center font-bold text-white bg-purple-light dark:bg-purple-dark rounded-full">0</span>
+<span>Marked for Review</span>
+</div>
+<div class="col-span-2 flex items-center gap-2">
+<span class="relative w-7 h-7 flex items-center justify-center font-bold text-white bg-purple-light dark:bg-purple-dark rounded-full">
+                0
+                <span class="material-symbols-outlined text-base absolute -bottom-1 -right-1 bg-surface-light dark:bg-surface-dark rounded-full text-green-light dark:text-green-dark">check_circle</span>
+</span>
+<div>
+<span>Answered &amp; Marked for Review</span>
+<span class="block text-subtext-light dark:text-subtext-dark">(will be considered for evaluation)</span>
+</div>
+</div>
+</div>
+<div class="border-t border-border-light dark:border-border-dark pt-4">
+<h3 class="font-bold mb-2">Questions</h3>
+<div class="grid grid-cols-7 gap-1.5 text-center">
+<button class="w-8 h-8 flex items-center justify-center bg-red-light dark:bg-red-dark text-white rounded-md">01</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">02</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">03</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">04</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">05</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">06</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">07</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">08</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">09</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">10</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">11</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">12</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">13</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">14</button>
+<button class="w-8 h-8 flex items-center justify-center bg-green-light dark:bg-green-dark text-white rounded-md">15</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">16</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">17</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">18</button>
+<button class="w-8 h-8 flex items-center justify-center bg-purple-light dark:bg-purple-dark text-white rounded-full">19</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">20</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">21</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">22</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">23</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">24</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">25</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">26</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">27</button>
+<button class="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-500 rounded-md">28</button>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-border-light dark:border-border-dark">
+<button class="w-full px-4 py-2 bg-green-light dark:bg-green-dark text-white font-bold rounded-md shadow-sm hover:opacity-90 transition-opacity text-lg">SUBMIT</button>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db import transaction
 from rest_framework import serializers
 from student.models import StudentProfile
 
@@ -21,6 +22,15 @@ class UserSerializer(serializers.ModelSerializer):
 			'email': {'required': True},
 		}
 
+	def validate_phone_number(self, value: str):
+		value = (value or '').strip()
+		if not value:
+			return value
+		# Basic server-side validation to align with model constraints
+		if len(value) > 15:
+			raise serializers.ValidationError('Phone number must be at most 15 characters.')
+		return value
+
 	def validate_email(self, value):
 		# Ensure email unique across User or StudentProfile
 		if User.objects.filter(email__iexact=value).exists():
@@ -30,22 +40,23 @@ class UserSerializer(serializers.ModelSerializer):
 		return value
 
 	def create(self, validated_data):
-		phone = validated_data.pop('phone_number', '').strip()
+		phone = (validated_data.pop('phone_number', '') or '').strip()
 		password = validated_data.pop('password')
-		user = User(
-			username=validated_data.get('username'),
-			email=validated_data.get('email')
-		)
-		user.set_password(password)
-		user.save()
+		# Ensure both user and profile are created atomically
+		with transaction.atomic():
+			user = User(
+				username=validated_data.get('username'),
+				email=validated_data.get('email')
+			)
+			user.set_password(password)
+			user.save()
 
-		# Create a related StudentProfile record
-		StudentProfile.objects.create(
-			user=user,
-			first_name=user.first_name or '',
-			last_name=user.last_name or '',
-			email=user.email,
-			phone_number=phone or None,
-		)
+			StudentProfile.objects.create(
+				user=user,
+				first_name=user.first_name or '',
+				last_name=user.last_name or '',
+				email=user.email,
+				phone_number=phone or None,
+			)
 		return user
 
