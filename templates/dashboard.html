@@ -68,10 +68,18 @@
         <!-- Bottom Section -->
         <div class="p-4 space-y-4">
             <!-- Start Exam Button -->
-            <button
-                class="w-full bg-[#f2960d] text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-[#c3824e] transition-colors">
-                Start Exam
-            </button>
+            {% if upcoming_exams %}
+                <a href="{% url 'instructions' upcoming_exams.0.id %}"
+                   class="w-full bg-[#f2960d] text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-[#c3824e] transition-colors text-center block">
+                    Start Exam
+                </a>
+            {% else %}
+                <button
+                    class="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
+                    disabled>
+                    No Exams Available
+                </button>
+            {% endif %}
 
             <!-- Profile Section -->
             <div class="flex items-center gap-3 px-3 py-2">
@@ -203,10 +211,10 @@
                             <p>{{ exam.description|truncatewords:20 }}</p>
                             {% endif %}
                         </div>
-                        <button
-                            class="w-full bg-[#f2960d] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors">
+                        <a href="{% url 'instructions' exam.id %}"
+                           class="w-full bg-[#f2960d] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors text-center block">
                             Start Exam
-                        </button>
+                        </a>
                     </div>
                 </div>
                 {% endfor %}

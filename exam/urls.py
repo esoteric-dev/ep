@@ -12,4 +12,7 @@ urlpatterns = [
     path('add-test-paper/', views.add_test_paper, name='add-test-paper'),
     path('view-exams/', views.view_exams, name='view-exams'),
     path('view-test-papers/', views.view_test_papers, name='view-test-papers'),
+    # New instruction and exam views
+    path('instructions/<int:exam_id>/', views.InstructionView.as_view(), name='instructions'),
+    path('exam/<int:exam_id>/', views.ExamView.as_view(), name='exam'),
 ]
