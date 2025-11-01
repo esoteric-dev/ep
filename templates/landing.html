@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamCentral - Your Central Hub for Exams</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
+</head>
+
+<body class="bg-white">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-nav">
+            <div class="logo-nav">
+                <div class="logo">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M8 0L9.41 2.59L12 1.17L10.59 3.76L13.17 4L10.59 6.59L12 9L9.41 7.59L8 10L6.59 7.59L4 9L5.41 6.59L2.83 4L5.41 3.76L4 1.17L6.59 2.59L8 0Z"
+                            fill="#171412" />
+                    </svg>
+                    <h1 class="logo-text">ExamCentral</h1>
+                </div>
+                <nav class="nav-links">
+                    <a href="{% url 'exam-list' %}" class="nav-link">Take Exam</a>
+                    <a href="{% url 'add-exam' %}" class="nav-link">Create Exam</a>
+                    <a href="#about" class="nav-link">About</a>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <form action="{% url 'exam-list' %}" method="get" class="search-form">
+                        <div class="search-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                                    stroke="#8a7a61" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <input type="text" name="search" placeholder="Search" class="search-input">
+                    </form>
+                </div>
+                <div class="auth-buttons">
+                    <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+                    <a href="{% url 'login' %}" class="btn btn-secondary">Log In</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="main-content">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-gradient"></div>
+                <img src="{% static 'images/hero-bg.jpg' %}" alt="Hero" class="hero-bg">
+                <div class="hero-content">
+                    <h2 class="hero-title">Your Central Hub for Exams</h2>
+                    <p class="hero-description">Find, take, or create exams with ease. Access a wide range of exams for
+                        various subjects and levels, or design your own to test your knowledge or challenge others.</p>
+                </div>
+                <div class="hero-search">
+                    <form action="{% url 'exam-list' %}" method="get" class="hero-search-form">
+                        <div class="hero-search-icon">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                                    stroke="#8a7a61" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <input type="text" name="search" placeholder="Search  for exams by title, subject, or creator"
+                            class="hero-search-input">
+                        <button type="submit" class="hero-search-btn">Search</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Upcoming Exams Section -->
+            <section class="section">
+                <h3 class="section-title">Upcoming Exams</h3>
+                <div class="exam-grid">
+                    {% for exam in upcoming_exams|slice:":4" %}
+                    <div class="exam-card">
+                        <div class="exam-card-image">
+                            <div class="exam-card-placeholder">
+                                <p>{{ exam.name|truncatewords:3 }}</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-content">
+                            <h4 class="exam-card-title">{{ exam.name }}</h4>
+                            <p class="exam-card-author">
+                                {% if exam.created_by %}
+                                    {{ exam.created_by.get_full_name|default:exam.created_by.username }}
+                                {% else %}
+                                    System Generated
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="exam-card">
+                        <div class="exam-card-image">
+                            <div class="exam-card-placeholder">
+                                <p>Mathematics Exam</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-content">
+                            <h4 class="exam-card-title">Mathematics Exam</h4>
+                            <p class="exam-card-author">Prof. Alex Turner</p>
+                        </div>
+                    </div>
+                    <div class="exam-card">
+                        <div class="exam-card-image">
+                            <div class="exam-card-placeholder">
+                                <p>Literature Quiz</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-content">
+                            <h4 class="exam-card-title">Literature Quiz</h4>
+                            <p class="exam-card-author">Dr. Olivia Reed</p>
+                        </div>
+                    </div>
+                    <div class="exam-card">
+                        <div class="exam-card-image">
+                            <div class="exam-card-placeholder">
+                                <p>Science Test</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-content">
+                            <h4 class="exam-card-title">Science Test</h4>
+                            <p class="exam-card-author">Dr. Ethan Clark</p>
+                        </div>
+                    </div>
+                    <div class="exam-card">
+                        <div class="exam-card-image">
+                            <div class="exam-card-placeholder">
+                                <p>History Challenge</p>
+                            </div>
+                        </div>
+                        <div class="exam-card-content">
+                            <h4 class="exam-card-title">History Challenge</h4>
+                            <p class="exam-card-author">Prof. Sophia Bennett</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- How It Works Section -->
+            <section class="section">
+                <h3 class="section-title">How It Works</h3>
+                <div class="features-section">
+                    <div class="features-intro">
+                        <h4 class="features-title">Simple Steps to Get Started</h4>
+                        <p class="features-desc">Whether you're taking an exam or creating one, ExamCentral makes it
+                            easy to get started and achieve your goals.</p>
+                    </div>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                                        stroke="#171412" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title">Search for Exams</h5>
+                                <p class="feature-desc">Use our powerful search to find the exact exams you need for
+                                    your studies or interests.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5"
+                                        stroke="#171412" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title">Take or Create Exams</h5>
+                                <p class="feature-desc">Easily take existing exams or create your own to test your
+                                    knowledge or challenge others.</p>
+                            </div>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M9 19C9 19.5523 9.44772 20 10 20H14C14.5523 20 15 19.5523 15 19V15H9V19ZM19 9C19 10.1046 18.1046 11 17 11H16V15H8V11H7C5.89543 11 5 10.1046 5 9V7C5 5.89543 5.89543 5 7 5H17C18.1046 5 19 5.89543 19 7V9Z"
+                                        stroke="#171412" stroke-width="2" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="feature-content">
+                                <h5 class="feature-title">Track Your Progress</h5>
+                                <p class="feature-desc">Monitor your performance and track your progress over time with
+                                    our intuitive tools.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Exam Categories Section -->
+            <section class="section">
+                <h3 class="section-title">Exam Categories</h3>
+                <div class="categories-grid">
+                    <a href="{% url 'exam-list' %}?category=Mathematics" class="category-tag">Mathematics</a>
+                    <a href="{% url 'exam-list' %}?category=Literature" class="category-tag">Literature</a>
+                    <a href="{% url 'exam-list' %}?category=Science" class="category-tag">Science</a>
+                    <a href="{% url 'exam-list' %}?category=History" class="category-tag">History</a>
+                    <a href="{% url 'exam-list' %}?category=Languages" class="category-tag">Languages</a>
+                    <a href="{% url 'exam-list' %}?category=Arts" class="category-tag">Arts</a>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="section">
+                <h3 class="section-title">Testimonials</h3>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-image">
+                            <div class="testimonial-placeholder">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                    <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="testimonial-content">
+                            <h4 class="testimonial-name">Sarah Miller</h4>
+                            <p class="testimonial-text">"ExamCentral helped me ace my finals!"</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-image">
+                            <div class="testimonial-placeholder">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                    <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="testimonial-content">
+                            <h4 class="testimonial-name">David Chen</h4>
+                            <p class="testimonial-text">"Creating exams for my study group has never been easier."</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-image">
+                            <div class="testimonial-placeholder">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                        d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                    <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z"
+                                        stroke="#8a7a61" stroke-width="2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="testimonial-content">
+                            <h4 class="testimonial-name">Emily White</h4>
+                            <p class="testimonial-text">"The variety of exams available is incredible."</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FAQs Section -->
+            <section class="section">
+                <h3 class="section-title">FAQs</h3>
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <p>How do I search for exams?</p>
+                            <button class="faq-toggle" type="button">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 6V14M6 10H14" stroke="#171412" stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="faq-answer">
+                            <p>You can search for exams using the search bar at the top of the page. Enter keywords
+                                related to the exam title, subject, or creator to find relevant exams.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <p>Can I create my own exams?</p>
+                            <button class="faq-toggle" type="button">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 6V14M6 10H14" stroke="#171412" stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="faq-answer hidden">
+                            <p>Yes! After signing up, you can create your own exams by clicking on the "Create Exam"
+                                button in the navigation menu.</p>
+                        </div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <p>Is there a way to track my progress?</p>
+                            <button class="faq-toggle" type="button">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M10 6V14M6 10H14" stroke="#171412" stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="faq-answer hidden">
+                            <p>Yes! Once you're logged in, you can access your dashboard to view your exam history,
+                                scores, and track your progress over time.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta-section">
+                <div class="cta-buttons">
+                    <a href="{% url 'exam-list' %}" class="btn btn-cta-primary">Take an Exam</a>
+                    <a href="{% url 'add-exam' %}" class="btn btn-cta-secondary">Create an Exam</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-nav">
+                <a href="#about" class="footer-link">About Us</a>
+                <a href="#contact" class="footer-link">Contact</a>
+                <a href="#terms" class="footer-link">Terms of Service</a>
+                <a href="#privacy" class="footer-link">Privacy Policy</a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2023 ExamCentral. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/landing.js' %}"></script>
+</body>
+
+</html>

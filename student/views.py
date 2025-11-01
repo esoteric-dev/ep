@@ -51,7 +51,7 @@ class DashboardView(TemplateView):
     
     def handle_no_permission(self):
         from django.shortcuts import redirect
-        return redirect('/')
+        return redirect('/login/')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

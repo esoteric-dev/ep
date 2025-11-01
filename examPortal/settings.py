@@ -154,5 +154,6 @@ CORS_ALLOW_ALL_ORIGINS = True  # You might want to remove this if not needed
 CORS_ALLOW_CREDENTIALS = True  # You might want to remove this if not needed
 
 # Authentication settings
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = 'dashboard'
-LOGOUT_REDIRECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'landing'
