@@ -1,0 +1,149 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Instructions - {{ exam.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-[#fcfaf7] font-rubik">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-[#1c170d] mb-2">Exam Instructions</h1>
+            <h2 class="text-xl text-[#616161]">{{ exam.name }}</h2>
+        </div>
+
+        <!-- Language Selection -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-[#1c170d] mb-4">Select Language</h3>
+            <div class="flex gap-4">
+                <label class="flex items-center">
+                    <input type="radio" name="language" value="English" checked class="mr-2 text-[#f2960d] focus:ring-[#f2960d]">
+                    <span class="text-[#1c170d]">English</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="language" value="Hindi" class="mr-2 text-[#f2960d] focus:ring-[#f2960d]">
+                    <span class="text-[#1c170d]">हिंदी (Hindi)</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Instructions Content -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-[#1c170d] mb-4">General Instructions</h3>
+            <div class="space-y-4 text-[#1c170d]">
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">1</span>
+                    <p>The total time for this examination is <strong>{{ exam.duration }}</strong>.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">2</span>
+                    <p>The examination will have a total of <strong>{{ total_questions }}</strong> questions.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">3</span>
+                    <p>Each question carries <strong>{{ exam.total_marks|floatformat:0 }}</strong> marks.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">4</span>
+                    <p>There will be <strong>NO NEGATIVE MARKING</strong> for any question.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">5</span>
+                    <p>All questions are compulsory and there is no choice in any question.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">6</span>
+                    <p>You can change your answer before final submission.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">7</span>
+                    <p>You can navigate between questions using the question palette or navigation buttons.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="w-6 h-6 bg-[#f2960d] text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5">8</span>
+                    <p>Do not refresh the page or close the browser during the examination.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Types -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-[#1c170d] mb-4">Question Types</h3>
+            <div class="space-y-3 text-[#1c170d]">
+                <div class="flex items-center gap-3">
+                    <span class="w-4 h-4 bg-blue-500 rounded-full"></span>
+                    <p><strong>MCQ (Multiple Choice Questions):</strong> Select one correct answer from the given options.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-4 h-4 bg-green-500 rounded-full"></span>
+                    <p><strong>MSQ (Multiple Select Questions):</strong> Select one or more correct answers from the given options.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="w-4 h-4 bg-purple-500 rounded-full"></span>
+                    <p><strong>Numerical Questions:</strong> Enter the numerical answer in the provided input field.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h3 class="text-lg font-semibold text-[#1c170d] mb-4">Terms and Conditions</h3>
+            <div class="space-y-3 text-[#1c170d] text-sm">
+                <p>1. I have read and understood all the instructions given above.</p>
+                <p>2. I agree to abide by the rules and regulations of the examination.</p>
+                <p>3. I understand that any malpractice will result in disqualification.</p>
+                <p>4. I confirm that I am appearing for this examination voluntarily.</p>
+                <p>5. I understand that the examination will be conducted in a fair and transparent manner.</p>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-center gap-4">
+            <a href="{% url 'dashboard' %}" 
+               class="px-6 py-3 bg-gray-300 text-[#1c170d] font-semibold rounded-lg hover:bg-gray-400 transition-colors">
+                Back to Dashboard
+            </a>
+            <button id="startExamBtn" 
+                    class="px-6 py-3 bg-[#f2960d] text-white font-semibold rounded-lg hover:bg-[#c3824e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                Start Exam
+            </button>
+        </div>
+
+        <!-- Terms Checkbox -->
+        <div class="text-center mt-6">
+            <label class="flex items-center justify-center gap-2 text-[#1c170d]">
+                <input type="checkbox" id="termsCheckbox" class="text-[#f2960d] focus:ring-[#f2960d]">
+                <span class="text-sm">I agree to the terms and conditions mentioned above</span>
+            </label>
+        </div>
+    </div>
+
+    <script>
+        // Enable/disable start exam button based on terms checkbox
+        const termsCheckbox = document.getElementById('termsCheckbox');
+        const startExamBtn = document.getElementById('startExamBtn');
+
+        termsCheckbox.addEventListener('change', function() {
+            startExamBtn.disabled = !this.checked;
+        });
+
+        // Handle start exam button click
+        startExamBtn.addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            const selectedLanguage = document.querySelector('input[name="language"]:checked').value;
+            const examId = {{ exam.id }};
+            
+            // Redirect to exam page with selected language
+            window.location.href = `/exam/${examId}/?language=${selectedLanguage}`;
+        });
+    </script>
+</body>
+</html>

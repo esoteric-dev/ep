@@ -21,10 +21,12 @@ from django.contrib.auth.views import LogoutView
 from api.views import UserCreateView
 from student.views import DashboardView, custom_logout_view
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from exam.views import LandingPageView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='login.html'), name='login'),  # Serve login page at root
+    path('', LandingPageView.as_view(), name='landing'),  # Landing page at root
+    path('login/', TemplateView.as_view(template_name='login.html'), name='login'),  # Login page
     path('signup/', TemplateView.as_view(template_name='signup.html'), name='signup'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),  # New dashboard route
     path('api/user/register/', UserCreateView.as_view(), name='user-create'),
@@ -32,5 +34,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework.urls')),
     path('logout/', custom_logout_view, name='logout'),
+    # Include exam URLs
+    path('', include('exam.urls')),
 ]
 
