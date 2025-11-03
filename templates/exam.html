@@ -216,7 +216,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeExam();
         startTimer();
-        generateQuestionGrid();
         
         // Initialize time tracking for first question
         examData.questionStartTime = Date.now();
@@ -226,17 +225,21 @@
     });
     
     // Track time when leaving a question
-    function trackTimeSpent(questionId) {
-        if (examData.questionStartTime && questionId) {
+    function trackTimeSpent(questionKey) {
+        if (examData.questionStartTime && questionKey) {
             const timeSpent = Math.floor((Date.now() - examData.questionStartTime) / 1000);
-            if (!examData.timeSpent[questionId]) {
-                examData.timeSpent[questionId] = 0;
+            if (!examData.timeSpent[questionKey]) {
+                examData.timeSpent[questionKey] = 0;
             }
-            examData.timeSpent[questionId] += timeSpent;
+            examData.timeSpent[questionKey] += timeSpent;
         }
     }
 
     function initializeExam() {
+        // Reset any prior state to avoid pre-marked questions
+        examData.answers = {};
+        examData.markedForReview = new Set();
+        examData.currentQuestion = 0;
         if (examData.questions.length > 0) {
             displayQuestion(0);
         }
@@ -248,7 +251,7 @@
         // Track time spent on previous question
         if (examData.currentQuestion >= 0 && examData.currentQuestion < examData.questions.length) {
             const prevQuestion = examData.questions[examData.currentQuestion];
-            trackTimeSpent(prevQuestion.id);
+            trackTimeSpent(prevQuestion.uid || prevQuestion.id);
         }
         
         examData.currentQuestion = questionIndex;
@@ -273,24 +276,24 @@
     
     function restoreAnswer(question) {
         if (question.type === 'mcq') {
-            const savedAnswer = examData.answers[question.id];
+            const savedAnswer = examData.answers[question.uid || question.id];
             if (savedAnswer) {
-                const radio = document.querySelector(`input[name="answer_${question.id}"][value="${savedAnswer}"]`);
+                const radio = document.querySelector(`input[name="answer_${question.uid || question.id}"][value="${savedAnswer}"]`);
                 if (radio) radio.checked = true;
             }
         } else if (question.type === 'msq') {
-            const savedAnswer = examData.answers[question.id];
+            const savedAnswer = examData.answers[question.uid || question.id];
             if (savedAnswer) {
                 const selected = savedAnswer.split(',');
                 selected.forEach(opt => {
-                    const checkbox = document.querySelector(`input[name="answer_${question.id}"][value="${opt}"]`);
+                    const checkbox = document.querySelector(`input[name="answer_${question.uid || question.id}"][value="${opt}"]`);
                     if (checkbox) checkbox.checked = true;
                 });
             }
         } else if (question.type === 'numerical') {
-            const savedAnswer = examData.answers[question.id];
+            const savedAnswer = examData.answers[question.uid || question.id];
             if (savedAnswer) {
-                const input = document.querySelector(`input[name="answer_${question.id}"]`);
+                const input = document.querySelector(`input[name="answer_${question.uid || question.id}"]`);
                 if (input) input.value = savedAnswer;
             }
         }
@@ -300,12 +303,14 @@
         // This will be called after each question is displayed
         document.addEventListener('change', function(e) {
             if (e.target.matches('input[type="radio"], input[type="checkbox"], input[type="number"]')) {
-                const questionId = e.target.name.replace('answer_', '');
-                const question = examData.questions.find(q => q.id == questionId);
+                const questionKey = e.target.name.replace('answer_', '');
+                const question = examData.questions.find(q => (q.uid || String(q.id)) == questionKey);
                 if (question) {
                     const answer = getCurrentAnswer(question);
-                    if (answer !== null) {
-                        examData.answers[question.id] = answer;
+                    if (isValueAnswered(question, answer)) {
+                        examData.answers[question.uid || question.id] = answer;
+                    } else {
+                        delete examData.answers[question.uid || question.id];
                     }
                     updateQuestionGrid();
                 }
@@ -325,10 +330,10 @@
         if (question.type === 'mcq') {
             html += '<div class="space-y-3"><p class="font-medium text-[#1c170d] mb-2">Options:</p>';
             Object.entries(question.options).forEach(([key, value]) => {
-                const isChecked = examData.answers[question.id] === key ? 'checked' : '';
+                const isChecked = examData.answers[question.uid || question.id] === key ? 'checked' : '';
                 html += `
                     <label class="flex items-center gap-3 p-3 border-2 border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8] transition-colors ${isChecked ? 'bg-[#f5ede8] border-[#f2960d]' : ''}">
-                        <input class="form-radio text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.id}" type="radio" value="${key}" ${isChecked}>
+                        <input class="form-radio text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.uid || question.id}" type="radio" value="${key}" ${isChecked}>
                         <span class="text-[#1c170d] flex-1">${key}. ${value}</span>
                     </label>
                 `;
@@ -337,22 +342,22 @@
         } else if (question.type === 'msq') {
             html += '<div class="space-y-3"><p class="font-medium text-[#1c170d] mb-2">Options (Select one or more):</p>';
             Object.entries(question.options).forEach(([key, value]) => {
-                const savedAnswer = examData.answers[question.id];
+                const savedAnswer = examData.answers[question.uid || question.id];
                 const isChecked = savedAnswer && savedAnswer.split(',').includes(key) ? 'checked' : '';
                 html += `
                     <label class="flex items-center gap-3 p-3 border-2 border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8] transition-colors ${isChecked ? 'bg-[#f5ede8] border-[#f2960d]' : ''}">
-                        <input class="form-checkbox text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.id}" type="checkbox" value="${key}" ${isChecked}>
+                        <input class="form-checkbox text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.uid || question.id}" type="checkbox" value="${key}" ${isChecked}>
                         <span class="text-[#1c170d] flex-1">${key}. ${value}</span>
                     </label>
                 `;
             });
             html += '</div>';
         } else if (question.type === 'numerical') {
-            const value = examData.answers[question.id] || '';
+            const value = examData.answers[question.uid || question.id] || '';
             html += `
                 <div class="space-y-3">
                     <p class="font-medium text-[#1c170d] mb-2">Enter your answer:</p>
-                    <input type="number" step="any" name="answer_${question.id}" value="${value}" 
+                    <input type="number" step="any" name="answer_${question.uid || question.id}" value="${value}" 
                            class="w-full p-3 border-2 border-[#e8decf] rounded-lg focus:ring-[#f2960d] focus:border-[#f2960d] text-lg" 
                            placeholder="Enter numerical answer">
                 </div>
@@ -360,6 +365,29 @@
         }
         
         return html;
+    }
+
+    function isValueAnswered(question, value) {
+        const saved = value;
+        if (saved === null || saved === undefined) return false;
+        if (question.type === 'msq') {
+            if (Array.isArray(saved)) return saved.filter(Boolean).length > 0;
+            if (typeof saved === 'string') return saved.split(',').filter(s => s && s.trim() !== '').length > 0;
+            return false;
+        }
+        if (question.type === 'numerical') {
+            // Treat empty string or NaN as unanswered
+            if (String(saved).trim() === '') return false;
+            return true;
+        }
+        if (question.type === 'mcq') {
+            return typeof saved === 'string' && saved.trim() !== '';
+        }
+        return false;
+    }
+
+    function isQuestionAnswered(question) {
+        return isValueAnswered(question, examData.answers[question.uid || question.id]);
     }
 
     function generateQuestionGrid() {
@@ -373,8 +401,8 @@
             button.onclick = () => displayQuestion(i);
             
             // Set button color based on status
-            const hasAnswer = examData.answers[examData.questions[i].id];
-            const isMarked = examData.markedForReview.has(i);
+            const hasAnswer = isQuestionAnswered(examData.questions[i]);
+            const isMarked = examData.markedForReview instanceof Set && examData.markedForReview.has((examData.questions[i].uid || examData.questions[i].id));
             
             if (i === examData.currentQuestion) {
                 button.className += ' bg-blue-600 text-white ring-2 ring-blue-300';
@@ -416,24 +444,26 @@
         const question = examData.questions[examData.currentQuestion];
         const answer = getCurrentAnswer(question);
         
-        if (answer !== null) {
-            examData.answers[question.id] = answer;
+        if (isValueAnswered(question, answer)) {
+            examData.answers[question.uid || question.id] = answer;
+        } else {
+            delete examData.answers[question.uid || question.id];
         }
         
-        trackTimeSpent(question.id);
+        trackTimeSpent(question.uid || question.id);
         updateQuestionGrid();
         nextQuestion();
     }
 
     function getCurrentAnswer(question) {
         if (question.type === 'mcq') {
-            const selected = document.querySelector(`input[name="answer_${question.id}"]:checked`);
+            const selected = document.querySelector(`input[name="answer_${question.uid || question.id}"]:checked`);
             return selected ? selected.value : null;
         } else if (question.type === 'msq') {
-            const selected = Array.from(document.querySelectorAll(`input[name="answer_${question.id}"]:checked`));
+            const selected = Array.from(document.querySelectorAll(`input[name="answer_${question.uid || question.id}"]:checked`));
             return selected.length > 0 ? selected.map(input => input.value).join(',') : null;
         } else if (question.type === 'numerical') {
-            const input = document.querySelector(`input[name="answer_${question.id}"]`);
+            const input = document.querySelector(`input[name="answer_${question.uid || question.id}"]`);
             return input ? input.value : null;
         }
         return null;
@@ -441,7 +471,7 @@
 
     function clearAnswer() {
         const question = examData.questions[examData.currentQuestion];
-        const inputs = document.querySelectorAll(`input[name="answer_${question.id}"]`);
+        const inputs = document.querySelectorAll(`input[name="answer_${question.uid || question.id}"]`);
         inputs.forEach(input => {
             if (input.type === 'checkbox' || input.type === 'radio') {
                 input.checked = false;
@@ -449,7 +479,7 @@
                 input.value = '';
             }
         });
-        delete examData.answers[question.id];
+        delete examData.answers[question.uid || question.id];
         updateQuestionGrid();
     }
 
@@ -457,17 +487,19 @@
     function markForReview() {
         const question = examData.questions[examData.currentQuestion];
         const answer = getCurrentAnswer(question);
-        if (answer !== null) {
-            examData.answers[question.id] = answer;
+        if (isValueAnswered(question, answer)) {
+            examData.answers[question.uid || question.id] = answer;
+        } else {
+            delete examData.answers[question.uid || question.id];
         }
-        examData.markedForReview.add(examData.currentQuestion);
+        examData.markedForReview.add(question.uid || question.id);
         updateQuestionGrid();
     }
     
     function markForReviewAndNext() {
         markForReview();
         const question = examData.questions[examData.currentQuestion];
-        trackTimeSpent(question.id);
+        trackTimeSpent(question.uid || question.id);
         nextQuestion();
     }
 
@@ -501,11 +533,11 @@
     function showSummaryModal() {
         // Track time on current question
         const question = examData.questions[examData.currentQuestion];
-        trackTimeSpent(question.id);
+        trackTimeSpent(question.uid || question.id);
         
         // Calculate summary
         const totalQuestions = examData.questions.length;
-        const answered = Object.keys(examData.answers).length;
+        const answered = examData.questions.reduce((acc, q) => acc + (isQuestionAnswered(q) ? 1 : 0), 0);
         const notAnswered = totalQuestions - answered;
         const markedCount = examData.markedForReview.size;
         
@@ -519,8 +551,8 @@
         const statusList = document.getElementById('questionStatusList');
         statusList.innerHTML = '';
         examData.questions.forEach((q, index) => {
-            const hasAnswer = examData.answers[q.id];
-            const isMarked = examData.markedForReview.has(index);
+            const hasAnswer = isQuestionAnswered(q);
+            const isMarked = examData.markedForReview.has(q.uid || q.id);
             const statusDiv = document.createElement('div');
             statusDiv.className = 'flex items-center justify-between p-2 rounded ' + 
                 (hasAnswer ? 'bg-green-50' : 'bg-red-50');
@@ -551,7 +583,7 @@
     async function confirmSubmit() {
         // Track time on current question
         const question = examData.questions[examData.currentQuestion];
-        trackTimeSpent(question.id);
+        trackTimeSpent(question.uid || question.id);
         
         closeSummaryModal();
         

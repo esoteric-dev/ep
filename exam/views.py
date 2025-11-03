@@ -150,6 +150,7 @@ class ExamView(TemplateView):
             for q in mcq_questions:
                 all_questions.append({
                     'id': q.id,
+                    'uid': f"mcq-{q.id}",
                     'type': 'mcq',
                     'number': q.question_number,
                     'text': q.question_text,
@@ -168,6 +169,7 @@ class ExamView(TemplateView):
             for q in msq_questions:
                 all_questions.append({
                     'id': q.id,
+                    'uid': f"msq-{q.id}",
                     'type': 'msq',
                     'number': q.question_number,
                     'text': q.question_text,
@@ -186,6 +188,7 @@ class ExamView(TemplateView):
             for q in numerical_questions:
                 all_questions.append({
                     'id': q.id,
+                    'uid': f"numerical-{q.id}",
                     'type': 'numerical',
                     'number': q.question_number,
                     'text': q.question_text,
@@ -278,9 +281,23 @@ def submit_exam(request, exam_id):
         processed_question_ids = set()
         
         # Process answered questions
-        for q_id, answer in answers.items():
-            q_id = int(q_id)
+        for raw_key, answer in answers.items():
+            # Support keys in format "type-id" (preferred) or plain numeric id (legacy)
             q_type = None
+            q_id = None
+            uid = str(raw_key)
+            if '-' in uid:
+                parts = uid.split('-', 1)
+                q_type = parts[0]
+                try:
+                    q_id = int(parts[1])
+                except ValueError:
+                    continue
+            else:
+                try:
+                    q_id = int(uid)
+                except ValueError:
+                    continue
             question_obj = None
             correct_answer = None
             is_correct = False
@@ -333,7 +350,7 @@ def submit_exam(request, exam_id):
                     'user_answer': answer,
                     'is_correct': is_correct,
                     'marks_obtained': marks_obtained,
-                    'time_spent': time_spent.get(str(q_id), 0),
+                    'time_spent': time_spent.get(uid, time_spent.get(str(q_id), 0)),
                     'topic': topic
                 })
         
@@ -348,7 +365,7 @@ def submit_exam(request, exam_id):
                     'user_answer': None,
                     'is_correct': False,
                     'marks_obtained': 0,
-                    'time_spent': time_spent.get(str(q_id), 0),
+                    'time_spent': time_spent.get(f'mcq-{q_id}', time_spent.get(str(q_id), 0)),
                     'topic': topic
                 })
         
@@ -362,7 +379,7 @@ def submit_exam(request, exam_id):
                     'user_answer': None,
                     'is_correct': False,
                     'marks_obtained': 0,
-                    'time_spent': time_spent.get(str(q_id), 0),
+                    'time_spent': time_spent.get(f'msq-{q_id}', time_spent.get(str(q_id), 0)),
                     'topic': topic
                 })
         
@@ -376,7 +393,7 @@ def submit_exam(request, exam_id):
                     'user_answer': None,
                     'is_correct': False,
                     'marks_obtained': 0,
-                    'time_spent': time_spent.get(str(q_id), 0),
+                    'time_spent': time_spent.get(f'numerical-{q_id}', time_spent.get(str(q_id), 0)),
                     'topic': topic
                 })
         
