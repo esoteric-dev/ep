@@ -1,0 +1,182 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Results - Exam Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+</head>
+
+<body class="min-h-screen bg-[#fcfaf7] font-rubik flex">
+    <!-- Sidebar -->
+    <aside class="w-[320px] bg-[#fcfaf7] min-h-screen sticky top-0 flex flex-col border-r border-[#e8decf]">
+        <div class="p-4">
+            <h1 class="font-medium text-base text-[#1c170d]">Exam Portal</h1>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="flex-1 px-4">
+            <div class="space-y-2">
+                <a href="/dashboard/" class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Dashboard</span>
+                </a>
+
+                <a href="{% url 'my-exams' %}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">My Exams</span>
+                </a>
+
+                <a href="{% url 'results' %}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#f5ede8] text-[#1c170d]">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Results</span>
+                </a>
+
+                <a href="{% url 'settings' %}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
+                    <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span class="font-medium text-sm">Settings</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Bottom Section -->
+        <div class="p-4 space-y-4">
+            <div class="flex items-center gap-3 px-3 py-2">
+                <a href="{% url 'logout' %}" onclick="handleLogout()"
+                    class="flex items-center gap-3 text-[#1c170d] hover:text-[#f2960d] transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    <span class="font-medium text-sm">Logout</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-8">
+        <!-- Page Title -->
+        <div class="mb-8">
+            <h1 class="text-[32px] font-bold text-[#1c170d]">Results</h1>
+            <p class="text-[#616161] mt-2">View detailed breakdown of all your exam attempts</p>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg p-6 border border-[#e8decf]">
+                <p class="text-sm text-[#616161] mb-1">Total Attempts</p>
+                <p class="text-3xl font-bold text-[#1c170d]">{{ total_attempts }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-6 border border-[#e8decf]">
+                <p class="text-sm text-[#616161] mb-1">Exams Taken</p>
+                <p class="text-3xl font-bold text-[#1c170d]">{{ exam_results|length }}</p>
+            </div>
+            <div class="bg-white rounded-lg p-6 border border-[#e8decf]">
+                <p class="text-sm text-[#616161] mb-1">Best Average</p>
+                <p class="text-3xl font-bold text-[#1c170d]">
+                    {% if exam_results %}
+                        {% for result in exam_results %}
+                            {% if forloop.first %}
+                                {{ result.best_score|floatformat:1 }}
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        0
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Exam Results -->
+        <div class="space-y-6">
+            {% for exam_result in exam_results %}
+            <div class="bg-white rounded-xl shadow-lg p-6 border border-[#e8decf]">
+                <!-- Exam Header -->
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-[#e8decf]">
+                    <div>
+                        <h2 class="text-xl font-bold text-[#1c170d] mb-1">{{ exam_result.exam.name }}</h2>
+                        <p class="text-sm text-[#616161]">{{ exam_result.attempt_count }} attempt{{ exam_result.attempt_count|pluralize }}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm text-[#616161] mb-1">Best Score</p>
+                        <p class="text-2xl font-bold text-green-600">
+                            {{ exam_result.best_score|floatformat:1 }} / {{ exam_result.exam.total_marks|floatformat:1 }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Attempts List -->
+                <div class="space-y-3">
+                    {% for attempt in exam_result.attempts %}
+                    <div class="flex items-center justify-between p-4 bg-[#fcfaf7] rounded-lg hover:bg-[#f5ede8] transition-colors">
+                        <div class="flex items-center gap-4 flex-1">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-[#616161]">Attempt #{{ attempt.attempt_number }}</span>
+                                <span class="text-xs text-[#616161]">{{ attempt.date_taken|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-[#616161]">Score:</span>
+                                <span class="font-bold text-[#1c170d]">
+                                    {{ attempt.score|floatformat:1 }} / {{ attempt.total_marks|floatformat:1 }}
+                                </span>
+                                <span class="text-sm font-medium {% if attempt.percentage >= 70 %}text-green-600{% elif attempt.percentage >= 50 %}text-yellow-600{% else %}text-red-600{% endif %}">
+                                    ({{ attempt.percentage|floatformat:1 }}%)
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-[#616161]">Time:</span>
+                                <span class="text-sm font-medium text-[#1c170d]">{{ attempt.time_taken }}</span>
+                            </div>
+                        </div>
+                        <a href="{% url 'exam-results' exam_result.exam.id attempt.id %}"
+                           class="px-4 py-2 bg-[#f2960d] text-white rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors">
+                            View Details
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="bg-white rounded-xl shadow-lg p-12 text-center border border-[#e8decf]">
+                <p class="text-[#616161] text-lg mb-4">No exam results yet.</p>
+                <a href="{% url 'my-exams' %}" class="text-[#f2960d] hover:text-[#c3824e] font-medium">
+                    Start your first exam →
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script>
+        function handleLogout() {
+            localStorage.clear();
+        }
+    </script>
+</body>
+</html>
+

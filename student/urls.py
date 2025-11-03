@@ -2,9 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("exams/", views.ExamListView.as_view(), name="exam-list"),
-    path("exams/<int:pk>/", views.ExamDetailView.as_view(), name="exam-detail"),
-    path("exams/create/", views.ExamCreateView.as_view(), name="exam-create"),
-    path("exams/<int:pk>/update/", views.ExamUpdateView.as_view(), name="exam-update"),
-    path("exams/<int:pk>/delete/", views.ExamDeleteView.as_view(), name="exam-delete"),
+    path("my-exams/", views.MyExamsView.as_view(), name="my-exams"),
+    path("results/", views.ResultsView.as_view(), name="results"),
+    path("settings/", views.SettingsView.as_view(), name="settings"),
+    path("update-profile/", views.update_profile, name="update-profile"),
 ]

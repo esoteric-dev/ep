@@ -31,7 +31,7 @@
                     <span class="font-medium text-sm">Dashboard</span>
                 </a>
 
-                <a href="#"
+                <a href="{% url 'my-exams' %}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
                     <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -41,7 +41,7 @@
                     <span class="font-medium text-sm">My Exams</span>
                 </a>
 
-                <a href="#"
+                <a href="{% url 'results' %}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
                     <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -51,7 +51,7 @@
                     <span class="font-medium text-sm">Results</span>
                 </a>
 
-                <a href="#"
+                <a href="{% url 'settings' %}"
                     class="flex items-center gap-3 px-3 py-2 rounded-lg text-[#1c170d] hover:bg-[#f5ede8] transition-colors">
                     <svg class="w-6 h-6 text-[#1c170d]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -69,16 +69,15 @@
         <div class="p-4 space-y-4">
             <!-- Start Exam Button -->
             {% if upcoming_exams %}
-                <a href="{% url 'instructions' upcoming_exams.0.id %}"
-                   class="w-full bg-[#f2960d] text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-[#c3824e] transition-colors text-center block">
-                    Start Exam
-                </a>
+            <a href="{% url 'instructions' upcoming_exams.0.id %}"
+                class="w-full bg-[#f2960d] text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-[#c3824e] transition-colors text-center block">
+                Start Exam
+            </a>
             {% else %}
-                <button
-                    class="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
-                    disabled>
-                    No Exams Available
-                </button>
+            <button class="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-lg text-sm cursor-not-allowed"
+                disabled>
+                No Exams Available
+            </button>
             {% endif %}
 
             <!-- Profile Section -->
@@ -212,7 +211,7 @@
                             {% endif %}
                         </div>
                         <a href="{% url 'instructions' exam.id %}"
-                           class="w-full bg-[#f2960d] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors text-center block">
+                            class="w-full bg-[#f2960d] text-white py-2 px-4 rounded-lg text-sm font-medium hover:bg-[#c3824e] transition-colors text-center block">
                             Start Exam
                         </a>
                     </div>
@@ -271,10 +270,10 @@
             // Clear localStorage tokens
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
-            
+
             // Clear any other stored data
             localStorage.clear();
-            
+
             // The page will redirect to login via the server-side logout view
         }
     </script>

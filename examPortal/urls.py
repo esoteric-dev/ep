@@ -36,5 +36,7 @@ urlpatterns = [
     path('logout/', custom_logout_view, name='logout'),
     # Include exam URLs
     path('', include('exam.urls')),
+    # Include student URLs
+    path('', include('student.urls')),
 ]
 
