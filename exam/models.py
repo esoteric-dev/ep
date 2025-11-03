@@ -37,6 +37,7 @@ class Question_type_mcq(models.Model):
     correct_option = models.CharField(max_length=1, choices=[('A', 'Option A'), ('B', 'Option B'), ('C', 'Option C'), ('D', 'Option D')])
     marks = models.FloatField(default=1.0)
     negative_marks = models.FloatField(default=0.0)
+    topic = models.CharField(max_length=100, null=True, blank=True)
     
     class Meta:
         ordering = ['question_number']
@@ -56,6 +57,7 @@ class Question_type_msq(models.Model):
     correct_options = models.CharField(max_length=4)
     marks = models.FloatField(default=1.0)
     negative_marks = models.FloatField(default=0.0)
+    topic = models.CharField(max_length=100, null=True, blank=True)
     
     class Meta:
         ordering = ['question_number']
@@ -71,6 +73,7 @@ class Question_type_numerical(models.Model):
     correct_answer = models.FloatField()
     marks = models.FloatField(default=1.0)
     negative_marks = models.FloatField(default=0.0)
+    topic = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
         ordering = ['question_number']

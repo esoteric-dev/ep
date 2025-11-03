@@ -146,29 +146,95 @@
 
             <!-- Submit Button -->
             <div class="mt-auto pt-4 border-t border-[#e8decf]">
-                <button class="w-full px-4 py-2 bg-green-600 text-white font-bold rounded-md shadow-sm hover:opacity-90 transition-opacity text-lg" onclick="submitExam()">SUBMIT</button>
+                <button class="w-full px-4 py-2 bg-green-600 text-white font-bold rounded-md shadow-sm hover:opacity-90 transition-opacity text-lg" onclick="showSummaryModal()">SUBMIT</button>
             </div>
         </div>
     </main>
 </div>
 
+<!-- Attempt Summary Modal -->
+<div id="summaryModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-[#1c170d] mb-4">Exam Summary</h2>
+            <div class="space-y-4 mb-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-[#f5ede8] p-4 rounded-lg">
+                        <p class="text-sm text-[#616161]">Total Questions</p>
+                        <p class="text-2xl font-bold text-[#1c170d]" id="summaryTotalQuestions">0</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <p class="text-sm text-[#616161]">Answered</p>
+                        <p class="text-2xl font-bold text-green-600" id="summaryAnswered">0</p>
+                    </div>
+                    <div class="bg-red-50 p-4 rounded-lg">
+                        <p class="text-sm text-[#616161]">Not Answered</p>
+                        <p class="text-2xl font-bold text-red-600" id="summaryNotAnswered">0</p>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-lg">
+                        <p class="text-sm text-[#616161]">Marked for Review</p>
+                        <p class="text-2xl font-bold text-purple-600" id="summaryMarked">0</p>
+                    </div>
+                </div>
+                <div class="border-t border-[#e8decf] pt-4">
+                    <p class="text-sm font-medium text-[#616161] mb-2">Question Status:</p>
+                    <div id="questionStatusList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="closeSummaryModal()" class="flex-1 px-4 py-2 bg-gray-200 text-[#1c170d] font-semibold rounded-md hover:opacity-90">Cancel</button>
+                <button onclick="confirmSubmit()" class="flex-1 px-4 py-2 bg-green-600 text-white font-semibold rounded-md hover:opacity-90">Confirm Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Exam data
     const examData = {
-        questions: {{ questions|safe }},
+        questions: [],
         currentQuestion: 0,
         answers: {},
         markedForReview: new Set(),
         timeRemaining: {{ duration_minutes }} * 60, // in seconds
-        language: '{{ language }}'
+        language: '{{ language }}',
+        timeSpent: {}, // Track time spent per question
+        questionStartTime: null,
+        examStartTime: Date.now(),
+        timerInterval: null
     };
+    
+    // Parse questions from JSON
+    try {
+        examData.questions = {{ questions_json|safe }};
+    } catch (e) {
+        console.error('Error parsing questions:', e);
+        examData.questions = [];
+    }
 
     // Initialize exam
     document.addEventListener('DOMContentLoaded', function() {
         initializeExam();
         startTimer();
         generateQuestionGrid();
+        
+        // Initialize time tracking for first question
+        examData.questionStartTime = Date.now();
+        
+        // Auto-save answer on input change
+        setupAutoSave();
     });
+    
+    // Track time when leaving a question
+    function trackTimeSpent(questionId) {
+        if (examData.questionStartTime && questionId) {
+            const timeSpent = Math.floor((Date.now() - examData.questionStartTime) / 1000);
+            if (!examData.timeSpent[questionId]) {
+                examData.timeSpent[questionId] = 0;
+            }
+            examData.timeSpent[questionId] += timeSpent;
+        }
+    }
 
     function initializeExam() {
         if (examData.questions.length > 0) {
@@ -178,6 +244,12 @@
 
     function displayQuestion(questionIndex) {
         if (questionIndex < 0 || questionIndex >= examData.questions.length) return;
+        
+        // Track time spent on previous question
+        if (examData.currentQuestion >= 0 && examData.currentQuestion < examData.questions.length) {
+            const prevQuestion = examData.questions[examData.currentQuestion];
+            trackTimeSpent(prevQuestion.id);
+        }
         
         examData.currentQuestion = questionIndex;
         const question = examData.questions[questionIndex];
@@ -189,37 +261,88 @@
         const contentDiv = document.getElementById('questionContent');
         contentDiv.innerHTML = generateQuestionHTML(question);
         
+        // Start tracking time for new question
+        examData.questionStartTime = Date.now();
+        
         // Update question grid
         updateQuestionGrid();
+        
+        // Restore answer if exists
+        restoreAnswer(question);
+    }
+    
+    function restoreAnswer(question) {
+        if (question.type === 'mcq') {
+            const savedAnswer = examData.answers[question.id];
+            if (savedAnswer) {
+                const radio = document.querySelector(`input[name="answer_${question.id}"][value="${savedAnswer}"]`);
+                if (radio) radio.checked = true;
+            }
+        } else if (question.type === 'msq') {
+            const savedAnswer = examData.answers[question.id];
+            if (savedAnswer) {
+                const selected = savedAnswer.split(',');
+                selected.forEach(opt => {
+                    const checkbox = document.querySelector(`input[name="answer_${question.id}"][value="${opt}"]`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        } else if (question.type === 'numerical') {
+            const savedAnswer = examData.answers[question.id];
+            if (savedAnswer) {
+                const input = document.querySelector(`input[name="answer_${question.id}"]`);
+                if (input) input.value = savedAnswer;
+            }
+        }
+    }
+    
+    function setupAutoSave() {
+        // This will be called after each question is displayed
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input[type="radio"], input[type="checkbox"], input[type="number"]')) {
+                const questionId = e.target.name.replace('answer_', '');
+                const question = examData.questions.find(q => q.id == questionId);
+                if (question) {
+                    const answer = getCurrentAnswer(question);
+                    if (answer !== null) {
+                        examData.answers[question.id] = answer;
+                    }
+                    updateQuestionGrid();
+                }
+            }
+        });
     }
 
     function generateQuestionHTML(question) {
         let html = `<p class="text-[#1c170d] mb-4">${question.text}</p>`;
         
-        if (question.image) {
-            html += `<img src="${question.image.url}" alt="Question Image" class="mb-4 max-w-full h-auto">`;
+        if (question.image && question.image.url) {
+            html += `<img src="${question.image.url}" alt="Question Image" class="mb-4 max-w-full h-auto rounded-lg shadow-sm">`;
+        } else if (question.image && typeof question.image === 'string') {
+            html += `<img src="${question.image}" alt="Question Image" class="mb-4 max-w-full h-auto rounded-lg shadow-sm">`;
         }
         
         if (question.type === 'mcq') {
-            html += '<div class="space-y-3"><p class="font-medium text-[#1c170d]">Options:</p>';
+            html += '<div class="space-y-3"><p class="font-medium text-[#1c170d] mb-2">Options:</p>';
             Object.entries(question.options).forEach(([key, value]) => {
                 const isChecked = examData.answers[question.id] === key ? 'checked' : '';
                 html += `
-                    <label class="flex items-center gap-3 p-3 border border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8]">
-                        <input class="form-radio text-[#f2960d] focus:ring-[#f2960d]" name="answer_${question.id}" type="radio" value="${key}" ${isChecked}>
-                        <span class="text-[#1c170d]">${key}. ${value}</span>
+                    <label class="flex items-center gap-3 p-3 border-2 border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8] transition-colors ${isChecked ? 'bg-[#f5ede8] border-[#f2960d]' : ''}">
+                        <input class="form-radio text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.id}" type="radio" value="${key}" ${isChecked}>
+                        <span class="text-[#1c170d] flex-1">${key}. ${value}</span>
                     </label>
                 `;
             });
             html += '</div>';
         } else if (question.type === 'msq') {
-            html += '<div class="space-y-3"><p class="font-medium text-[#1c170d]">Options (Select one or more):</p>';
+            html += '<div class="space-y-3"><p class="font-medium text-[#1c170d] mb-2">Options (Select one or more):</p>';
             Object.entries(question.options).forEach(([key, value]) => {
-                const isChecked = examData.answers[question.id] && examData.answers[question.id].includes(key) ? 'checked' : '';
+                const savedAnswer = examData.answers[question.id];
+                const isChecked = savedAnswer && savedAnswer.split(',').includes(key) ? 'checked' : '';
                 html += `
-                    <label class="flex items-center gap-3 p-3 border border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8]">
-                        <input class="form-checkbox text-[#f2960d] focus:ring-[#f2960d]" name="answer_${question.id}" type="checkbox" value="${key}" ${isChecked}>
-                        <span class="text-[#1c170d]">${key}. ${value}</span>
+                    <label class="flex items-center gap-3 p-3 border-2 border-[#e8decf] rounded-lg cursor-pointer hover:bg-[#f5ede8] transition-colors ${isChecked ? 'bg-[#f5ede8] border-[#f2960d]' : ''}">
+                        <input class="form-checkbox text-[#f2960d] focus:ring-[#f2960d] w-5 h-5" name="answer_${question.id}" type="checkbox" value="${key}" ${isChecked}>
+                        <span class="text-[#1c170d] flex-1">${key}. ${value}</span>
                     </label>
                 `;
             });
@@ -228,9 +351,9 @@
             const value = examData.answers[question.id] || '';
             html += `
                 <div class="space-y-3">
-                    <p class="font-medium text-[#1c170d]">Enter your answer:</p>
-                    <input type="number" name="answer_${question.id}" value="${value}" 
-                           class="w-full p-3 border border-[#e8decf] rounded-lg focus:ring-[#f2960d] focus:border-[#f2960d]" 
+                    <p class="font-medium text-[#1c170d] mb-2">Enter your answer:</p>
+                    <input type="number" step="any" name="answer_${question.id}" value="${value}" 
+                           class="w-full p-3 border-2 border-[#e8decf] rounded-lg focus:ring-[#f2960d] focus:border-[#f2960d] text-lg" 
                            placeholder="Enter numerical answer">
                 </div>
             `;
@@ -250,12 +373,21 @@
             button.onclick = () => displayQuestion(i);
             
             // Set button color based on status
+            const hasAnswer = examData.answers[examData.questions[i].id];
+            const isMarked = examData.markedForReview.has(i);
+            
             if (i === examData.currentQuestion) {
-                button.className += ' bg-blue-600 text-white';
-            } else if (examData.answers[examData.questions[i].id]) {
+                button.className += ' bg-blue-600 text-white ring-2 ring-blue-300';
+            } else if (hasAnswer && isMarked) {
+                button.className += ' bg-purple-600 text-white relative';
+                const checkIcon = document.createElement('span');
+                checkIcon.className = 'absolute -bottom-1 -right-1 text-xs';
+                checkIcon.innerHTML = '✓';
+                button.appendChild(checkIcon);
+            } else if (hasAnswer) {
                 button.className += ' bg-green-600 text-white';
-            } else if (examData.markedForReview.has(i)) {
-                button.className += ' bg-purple-600 text-white';
+            } else if (isMarked) {
+                button.className += ' bg-purple-600 text-white rounded-full';
             } else {
                 button.className += ' bg-gray-300 text-gray-700';
             }
@@ -288,6 +420,8 @@
             examData.answers[question.id] = answer;
         }
         
+        trackTimeSpent(question.id);
+        updateQuestionGrid();
         nextQuestion();
     }
 
@@ -319,13 +453,21 @@
         updateQuestionGrid();
     }
 
+
     function markForReview() {
+        const question = examData.questions[examData.currentQuestion];
+        const answer = getCurrentAnswer(question);
+        if (answer !== null) {
+            examData.answers[question.id] = answer;
+        }
         examData.markedForReview.add(examData.currentQuestion);
         updateQuestionGrid();
     }
-
+    
     function markForReviewAndNext() {
         markForReview();
+        const question = examData.questions[examData.currentQuestion];
+        trackTimeSpent(question.id);
         nextQuestion();
     }
 
@@ -340,28 +482,127 @@
     function startTimer() {
         const timerElement = document.getElementById('remainingTime');
         
-        const timer = setInterval(() => {
+        examData.timerInterval = setInterval(() => {
             examData.timeRemaining--;
             
             const minutes = Math.floor(examData.timeRemaining / 60);
             const seconds = examData.timeRemaining % 60;
             
             timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timer').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
             
             if (examData.timeRemaining <= 0) {
-                clearInterval(timer);
-                submitExam();
+                clearInterval(examData.timerInterval);
+                confirmSubmit();
             }
         }, 1000);
     }
-
-    function submitExam() {
-        if (confirm('Are you sure you want to submit the exam? This action cannot be undone.')) {
-            // Here you would typically send the answers to the server
-            console.log('Exam submitted with answers:', examData.answers);
-            alert('Exam submitted successfully!');
-            window.location.href = '/dashboard/';
+    
+    function showSummaryModal() {
+        // Track time on current question
+        const question = examData.questions[examData.currentQuestion];
+        trackTimeSpent(question.id);
+        
+        // Calculate summary
+        const totalQuestions = examData.questions.length;
+        const answered = Object.keys(examData.answers).length;
+        const notAnswered = totalQuestions - answered;
+        const markedCount = examData.markedForReview.size;
+        
+        // Update modal content
+        document.getElementById('summaryTotalQuestions').textContent = totalQuestions;
+        document.getElementById('summaryAnswered').textContent = answered;
+        document.getElementById('summaryNotAnswered').textContent = notAnswered;
+        document.getElementById('summaryMarked').textContent = markedCount;
+        
+        // Generate question status list
+        const statusList = document.getElementById('questionStatusList');
+        statusList.innerHTML = '';
+        examData.questions.forEach((q, index) => {
+            const hasAnswer = examData.answers[q.id];
+            const isMarked = examData.markedForReview.has(index);
+            const statusDiv = document.createElement('div');
+            statusDiv.className = 'flex items-center justify-between p-2 rounded ' + 
+                (hasAnswer ? 'bg-green-50' : 'bg-red-50');
+            
+            let statusText = `Q${index + 1}: `;
+            if (hasAnswer && isMarked) {
+                statusText += 'Answered & Marked for Review';
+            } else if (hasAnswer) {
+                statusText += 'Answered';
+            } else if (isMarked) {
+                statusText += 'Marked for Review (Not Answered)';
+            } else {
+                statusText += 'Not Answered';
+            }
+            
+            statusDiv.innerHTML = `<span class="text-sm">${statusText}</span>`;
+            statusList.appendChild(statusDiv);
+        });
+        
+        // Show modal
+        document.getElementById('summaryModal').classList.remove('hidden');
+    }
+    
+    function closeSummaryModal() {
+        document.getElementById('summaryModal').classList.add('hidden');
+    }
+    
+    async function confirmSubmit() {
+        // Track time on current question
+        const question = examData.questions[examData.currentQuestion];
+        trackTimeSpent(question.id);
+        
+        closeSummaryModal();
+        
+        // Calculate total time taken
+        const totalTime = Math.floor((Date.now() - examData.examStartTime) / 1000);
+        
+        // Prepare submission data
+        const submissionData = {
+            answers: examData.answers,
+            time_spent: examData.timeSpent,
+            start_time: examData.examStartTime,
+            total_time: totalTime
+        };
+        
+        try {
+            const response = await fetch(`/exam/{{ exam.id }}/submit/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(submissionData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                clearInterval(examData.timerInterval);
+                window.location.href = result.redirect_url;
+            } else {
+                alert('Error submitting exam: ' + (result.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            alert('Error submitting exam. Please try again.');
         }
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
     // Language selector change handler

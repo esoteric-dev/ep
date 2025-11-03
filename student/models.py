@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from exam.models import Exam
+import json
 
 
 class StudentProfile(models.Model):
@@ -25,6 +26,10 @@ class ExamAttempt(models.Model):
     score = models.FloatField()
     date_taken = models.DateTimeField(auto_now_add=True)
     time_taken = models.DurationField()
+    total_marks = models.FloatField(default=0)
+    percentage = models.FloatField(default=0)
+    answers_json = models.TextField(default='{}')  # Store all answers as JSON
+    time_spent_json = models.TextField(default='{}')  # Store time spent per question as JSON
 
     class Meta:
         unique_together = ['student', 'exam', 'attempt_number']
@@ -32,3 +37,39 @@ class ExamAttempt(models.Model):
 
     def __str__(self):
         return f"{self.student.user.username} - {self.exam.name} - Attempt {self.attempt_number}"
+    
+    def get_answers(self):
+        """Return answers as dictionary"""
+        try:
+            return json.loads(self.answers_json)
+        except:
+            return {}
+    
+    def get_time_spent(self):
+        """Return time spent per question as dictionary"""
+        try:
+            return json.loads(self.time_spent_json)
+        except:
+            return {}
+
+
+class QuestionAnswer(models.Model):
+    """Individual question answer with detailed tracking"""
+    attempt = models.ForeignKey(ExamAttempt, on_delete=models.CASCADE, related_name='question_answers')
+    question_id = models.IntegerField()
+    question_type = models.CharField(max_length=20, choices=[
+        ('mcq', 'MCQ'),
+        ('msq', 'MSQ'),
+        ('numerical', 'Numerical')
+    ])
+    user_answer = models.TextField(null=True, blank=True)
+    is_correct = models.BooleanField(default=False)
+    marks_obtained = models.FloatField(default=0)
+    time_spent_seconds = models.IntegerField(default=0)
+    topic = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        ordering = ['question_id']
+    
+    def __str__(self):
+        return f"Q{self.question_id} - Attempt {self.attempt.attempt_number}"

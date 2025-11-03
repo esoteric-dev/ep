@@ -15,4 +15,6 @@ urlpatterns = [
     # New instruction and exam views
     path('instructions/<int:exam_id>/', views.InstructionView.as_view(), name='instructions'),
     path('exam/<int:exam_id>/', views.ExamView.as_view(), name='exam'),
+    path('exam/<int:exam_id>/submit/', views.submit_exam, name='submit-exam'),
+    path('exam/<int:exam_id>/results/<int:attempt_id>/', views.ExamResultsView.as_view(), name='exam-results'),
 ]
