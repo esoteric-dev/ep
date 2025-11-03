@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Login - Exam Portal</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fef6ef] font-rubik min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md p-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-[#1c170d] mb-2">Teacher Portal</h1>
+                <p class="text-[#616161]">Sign in to manage exams and questions</p>
+            </div>
+            
+            <form id="teacherLoginForm" class="space-y-6">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm font-medium text-[#1c170d] mb-2">Username</label>
+                    <input type="text" id="username" name="username" required
+                           class="w-full px-4 py-3 border border-[#e8decf] rounded-lg focus:ring-2 focus:ring-[#f2960d] focus:border-[#f2960d] outline-none">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-[#1c170d] mb-2">Password</label>
+                    <input type="password" id="password" name="password" required
+                           class="w-full px-4 py-3 border border-[#e8decf] rounded-lg focus:ring-2 focus:ring-[#f2960d] focus:border-[#f2960d] outline-none">
+                </div>
+                
+                <div id="errorMessage" class="hidden text-red-600 text-sm"></div>
+                
+                <button type="submit" 
+                        class="w-full bg-[#f2960d] text-white py-3 rounded-lg font-semibold hover:bg-[#c3824e] transition-colors">
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="mt-6 text-center">
+                <a href="/" class="text-sm text-[#f2960d] hover:text-[#c3824e]">Back to Home</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('teacherLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.classList.add('hidden');
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/teacher/api/login/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+

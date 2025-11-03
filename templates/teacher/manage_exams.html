@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Exams - Teacher Portal</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-[#fcfaf7] font-rubik">
+    <nav class="bg-white shadow-md border-b border-[#e8decf]">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-[#1c170d]">Manage Exams</h1>
+            <div class="flex gap-4">
+                <a href="{% url 'teacher-dashboard' %}" class="text-[#f2960d] hover:text-[#c3824e]">Dashboard</a>
+                <a href="{% url 'teacher-create-exam' %}" class="text-[#f2960d] hover:text-[#c3824e]">Create Exam</a>
+                <a href="/logout/" class="text-[#616161] hover:text-[#1c170d]">Logout</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow p-8">
+            <h2 class="text-2xl font-semibold text-[#1c170d] mb-6">All Exams</h2>
+            
+            {% if exams %}
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-[#e8decf]">
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Exam Name</th>
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Description</th>
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Duration</th>
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Total Marks</th>
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Test Papers</th>
+                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for exam in exams %}
+                        <tr class="border-b border-[#e8decf] hover:bg-[#f5ede8]">
+                            <td class="py-4 text-[#1c170d] font-medium">{{ exam.name }}</td>
+                            <td class="py-4 text-[#616161] text-sm">{{ exam.description|truncatewords:10|default:"-" }}</td>
+                            <td class="py-4 text-[#616161]">{{ exam.duration }}</td>
+                            <td class="py-4 text-[#616161]">{{ exam.total_marks }}</td>
+                            <td class="py-4 text-[#616161]">{{ exam.test_papers.count }}</td>
+                            <td class="py-4">
+                                <a href="{% url 'teacher-upload-paper' %}?exam_id={{ exam.id }}" 
+                                   class="text-[#f2960d] hover:text-[#c3824e] text-sm mr-3">Upload Paper</a>
+                                <a href="/courses/{{ exam.id }}/" 
+                                   class="text-blue-600 hover:text-blue-800 text-sm">View</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <p class="text-[#616161] mb-4">No exams created yet.</p>
+                <a href="{% url 'teacher-create-exam' %}" 
+                   class="inline-block bg-[#f2960d] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#c3824e] transition-colors">
+                    Create Your First Exam
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
+
