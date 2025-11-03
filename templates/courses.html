@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+</head>
+<body class="bg-[#fcfaf7] font-rubik">
+    <div class="min-h-screen container mx-auto p-4">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-[#1c170d]">Courses</h1>
+            <a href="/dashboard/" class="text-sm text-[#f2960d] hover:text-[#c3824e]">Back to Dashboard</a>
+        </div>
+
+        {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for course in courses %}
+            <div class="bg-white rounded-lg shadow p-6 flex flex-col">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 class="text-lg font-semibold text-[#1c170d]">{{ course.name }}</h2>
+                    <span class="text-sm text-[#616161]">{{ course.duration }}</span>
+                </div>
+                <p class="text-sm text-[#616161] mb-4">Total Marks: {{ course.total_marks }}</p>
+                {% if course.description %}
+                <p class="text-sm text-[#616161] mb-4">{{ course.description|truncatewords:20 }}</p>
+                {% endif %}
+                {% if request.user.is_authenticated %}
+                <div class="mt-auto flex gap-2">
+                    <a href="{% url 'instructions' course.id %}" class="flex-1 bg-[#f2960d] text-white py-2 px-4 rounded-md text-center font-semibold hover:opacity-90">Start Exam</a>
+                    <a href="{% url 'course-exams' course.id %}" class="flex-1 bg-gray-200 text-[#1c170d] py-2 px-4 rounded-md text-center font-semibold hover:opacity-90">View Exams</a>
+                </div>
+                {% else %}
+                <a href="/login/" class="mt-auto bg-gray-300 text-[#1c170d] py-2 px-4 rounded-md text-center font-semibold hover:opacity-90">Login to View Exams</a>
+                <p class="text-xs text-[#616161] mt-2">Don’t have an account? <a href="/signup/" class="text-[#f2960d] hover:text-[#c3824e]">Sign up</a></p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-[#616161]">No courses available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+

@@ -112,6 +112,50 @@ class InstructionView(TemplateView):
         return context
 
 
+class CoursesView(TemplateView):
+    template_name = 'courses.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # Publicly accessible: allow viewing courses without login,
+        # but hydrate user from JWT if present so is_authenticated works in template
+        jwt_auth = JWTAuthentication()
+        try:
+            validated_token = jwt_auth.get_validated_token(request.COOKIES.get('jwt', ''))
+            request.user = jwt_auth.get_user(validated_token)
+        except Exception:
+            pass
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['courses'] = Exam.objects.all().order_by('name')
+        return context
+
+
+class CourseExamsView(TemplateView):
+    template_name = 'course_exams.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        jwt_auth = JWTAuthentication()
+        try:
+            validated_token = jwt_auth.get_validated_token(request.COOKIES.get('jwt', ''))
+            request.user = jwt_auth.get_user(validated_token)
+        except Exception:
+            pass
+        if not request.user.is_authenticated:
+            return redirect('/login/')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        exam_id = self.kwargs.get('exam_id')
+        exam = get_object_or_404(Exam, id=exam_id)
+        test_papers = exam.test_papers.all().order_by('-is_active', 'id') if hasattr(exam, 'test_papers') else []
+        context['exam'] = exam
+        context['test_papers'] = test_papers
+        return context
+
+
 class ExamView(TemplateView):
     template_name = 'exam.html'
     

@@ -17,4 +17,7 @@ urlpatterns = [
     path('exam/<int:exam_id>/', views.ExamView.as_view(), name='exam'),
     path('exam/<int:exam_id>/submit/', views.submit_exam, name='submit-exam'),
     path('exam/<int:exam_id>/results/<int:attempt_id>/', views.ExamResultsView.as_view(), name='exam-results'),
+    # Courses and course exams pages
+    path('courses/', views.CoursesView.as_view(), name='courses'),
+    path('courses/<int:exam_id>/', views.CourseExamsView.as_view(), name='course-exams'),
 ]
