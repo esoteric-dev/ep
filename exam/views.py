@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import generics
@@ -269,6 +270,16 @@ class ExamView(TemplateView):
         
         # Serialize questions as JSON for frontend
         context['questions_json'] = json.dumps(context['questions'])
+
+        # Ads config: show only for non-premium students
+        is_premium = False
+        try:
+            is_premium = bool(StudentProfile.objects.filter(user=self.request.user).values_list('is_premium', flat=True).first())
+        except Exception:
+            is_premium = False
+        context['show_ads'] = (not is_premium)
+        context['adsense_client'] = getattr(settings, 'ADSENSE_CLIENT', '')
+        context['adsense_slot_exam'] = getattr(settings, 'ADSENSE_SLOT_EXAM', '')
         
         return context
 
@@ -587,5 +598,15 @@ class ExamResultsView(TemplateView):
         context['answered_count'] = sum(1 for qa in question_answers if qa.user_answer)
         context['correct_count'] = sum(1 for qa in question_answers if qa.is_correct)
         context['incorrect_count'] = sum(1 for qa in question_answers if qa.user_answer and not qa.is_correct)
+
+        # Ads config: show only for non-premium students
+        is_premium = False
+        try:
+            is_premium = bool(StudentProfile.objects.filter(user=self.request.user).values_list('is_premium', flat=True).first())
+        except Exception:
+            is_premium = False
+        context['show_ads'] = (not is_premium)
+        context['adsense_client'] = getattr(settings, 'ADSENSE_CLIENT', '')
+        context['adsense_slot_results'] = getattr(settings, 'ADSENSE_SLOT_RESULTS', '')
         
         return context

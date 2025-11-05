@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView
+from django.conf import settings
 from django.db.models import Count, Avg, Max
 from django.contrib.auth import logout
 from django.http import HttpResponseRedirect, JsonResponse
@@ -207,6 +208,12 @@ class ResultsView(TemplateView):
         
         context['exam_results'] = exam_results
         context['total_attempts'] = all_attempts.count()
+
+        # Ads config: show only for non-premium students
+        is_premium = bool(getattr(student, 'is_premium', False))
+        context['show_ads'] = (not is_premium)
+        context['adsense_client'] = getattr(settings, 'ADSENSE_CLIENT', '')
+        context['adsense_slot_results'] = getattr(settings, 'ADSENSE_SLOT_RESULTS', '')
         
         return context
 

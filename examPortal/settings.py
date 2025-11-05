@@ -148,6 +148,15 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Google AdSense configuration (set via environment variables)
+# Example in .env:
+# ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX
+# ADSENSE_SLOT_EXAM=1234567890
+# ADSENSE_SLOT_RESULTS=0987654321
+ADSENSE_CLIENT = os.getenv('ADSENSE_CLIENT', '')
+ADSENSE_SLOT_EXAM = os.getenv('ADSENSE_SLOT_EXAM', '')
+ADSENSE_SLOT_RESULTS = os.getenv('ADSENSE_SLOT_RESULTS', '')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

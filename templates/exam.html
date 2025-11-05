@@ -13,6 +13,9 @@
 
 <body class="bg-[#fcfaf7] font-rubik">
 <div class="min-h-screen flex flex-col" id="exam-container">
+    {% if show_ads and adsense_client %}
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}" crossorigin="anonymous"></script>
+    {% endif %}
     <!-- Header -->
     <header class="bg-white shadow-md border-b border-[#e8decf]">
         <div class="container mx-auto px-4 py-2 flex justify-between items-center">
@@ -35,6 +38,19 @@
     </header>
 
     <main class="flex-grow container mx-auto p-4 flex flex-col lg:flex-row gap-4">
+        {% if show_ads and adsense_client %}
+        <div class="mb-4 w-full">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="{{ adsense_client }}"
+                 data-ad-slot="{{ adsense_slot_exam|default:'1234567890' }}"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        {% endif %}
         <!-- Question Area -->
         <div class="flex-grow bg-white rounded-lg shadow p-6 flex flex-col">
             <div class="flex-grow">
@@ -148,6 +164,19 @@
             <div class="mt-auto pt-4 border-t border-[#e8decf]">
                 <button class="w-full px-4 py-2 bg-green-600 text-white font-bold rounded-md shadow-sm hover:opacity-90 transition-opacity text-lg" onclick="showSummaryModal()">SUBMIT</button>
             </div>
+            {% if show_ads and adsense_client %}
+            <div class="mt-4">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="{{ adsense_client }}"
+                     data-ad-slot="{{ adsense_slot_exam|default:'1234567890' }}"
+                     data-ad-format="rectangle, horizontal"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            {% endif %}
         </div>
     </main>
 </div>
