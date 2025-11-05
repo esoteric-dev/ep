@@ -126,20 +126,18 @@
                             <span class="text-[#616161]">Best Score:</span>
                             <span class="font-semibold text-green-600">
                                 {% if exam_info.best_score %}
-                                {{ exam_info.best_score|floatformat:1 }} / {{ exam_info.exam.total_marks|floatformat:1
-                                }}
+                                {{ exam_info.best_score|floatformat:1 }} / {{ exam_info.exam.total_marks|floatformat:1}}
                                 {% else %}
                                 --
                                 {% endif %}
                             </span>
                         </div>
-                        {% if exam_info.latest_attempt %}
+                        <!-- {% if exam_info.latest_attempt %}
                         <div class="flex items-center justify-between text-sm">
                             <span class="text-[#616161]">Last Attempt:</span>
-                            <span class="font-semibold text-[#1c170d]">{{ exam_info.latest_attempt.date_taken|date:"M d,
-                                Y" }}</span>
+                            <span class="font-semibold text-[#1c170d]">{{ exam_info.latest_attempt.date_taken|date:"M d, Y" }}</span>
                         </div>
-                        {% endif %}
+                        {% endif %} -->
                         {% endif %}
                     </div>
 
