@@ -10,5 +10,7 @@ urlpatterns = [
     path('upload-paper/', views.UploadPaperView.as_view(), name='teacher-upload-paper'),
     path('api/upload-paper/', views.upload_paper_api, name='teacher-upload-paper-api'),
     path('manage-exams/', views.ManageExamsView.as_view(), name='teacher-manage-exams'),
+    path('api/delete-exam/<int:exam_id>/', views.delete_exam_api, name='teacher-delete-exam-api'),
+    path('api/delete-test-paper/<int:test_paper_id>/', views.delete_test_paper_api, name='teacher-delete-test-paper-api'),
 ]
 

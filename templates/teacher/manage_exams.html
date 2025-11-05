@@ -26,36 +26,79 @@
             <h2 class="text-2xl font-semibold text-[#1c170d] mb-6">All Exams</h2>
             
             {% if exams %}
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="border-b border-[#e8decf]">
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Exam Name</th>
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Description</th>
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Duration</th>
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Total Marks</th>
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Test Papers</th>
-                            <th class="text-left py-3 text-sm font-semibold text-[#1c170d]">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for exam in exams %}
-                        <tr class="border-b border-[#e8decf] hover:bg-[#f5ede8]">
-                            <td class="py-4 text-[#1c170d] font-medium">{{ exam.name }}</td>
-                            <td class="py-4 text-[#616161] text-sm">{{ exam.description|truncatewords:10|default:"-" }}</td>
-                            <td class="py-4 text-[#616161]">{{ exam.duration }}</td>
-                            <td class="py-4 text-[#616161]">{{ exam.total_marks }}</td>
-                            <td class="py-4 text-[#616161]">{{ exam.test_papers.count }}</td>
-                            <td class="py-4">
+            <div class="space-y-6">
+                {% for exam in exams %}
+                <div class="border border-[#e8decf] rounded-lg overflow-hidden">
+                    <!-- Exam Header -->
+                    <div class="bg-[#f5ede8] p-4 border-b border-[#e8decf]">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-semibold text-[#1c170d] mb-2">{{ exam.name }}</h3>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-[#616161]">
+                                    <div>
+                                        <span class="font-medium">Description:</span>
+                                        <span class="ml-2">{{ exam.description|truncatewords:10|default:"-" }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Duration:</span>
+                                        <span class="ml-2">{{ exam.duration }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Total Marks:</span>
+                                        <span class="ml-2">{{ exam.total_marks }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Test Papers:</span>
+                                        <span class="ml-2">{{ exam.test_papers.count }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 ml-4">
                                 <a href="{% url 'teacher-upload-paper' %}?exam_id={{ exam.id }}" 
-                                   class="text-[#f2960d] hover:text-[#c3824e] text-sm mr-3">Upload Paper</a>
+                                   class="text-[#f2960d] hover:text-[#c3824e] text-sm px-3 py-1 bg-white rounded border border-[#e8decf] hover:border-[#f2960d] transition-colors">
+                                    Upload Paper
+                                </a>
                                 <a href="/courses/{{ exam.id }}/" 
-                                   class="text-blue-600 hover:text-blue-800 text-sm">View</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                   class="text-blue-600 hover:text-blue-800 text-sm px-3 py-1 bg-white rounded border border-[#e8decf] hover:border-blue-600 transition-colors">
+                                    View
+                                </a>
+                                <button onclick="deleteExam({{ exam.id }}, '{{ exam.name|escapejs }}')" 
+                                        class="text-red-600 hover:text-red-800 text-sm px-3 py-1 bg-white rounded border border-[#e8decf] hover:border-red-600 transition-colors">
+                                    Delete Exam
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Test Papers Section -->
+                    {% if exam.test_papers.all %}
+                    <div class="p-4">
+                        <h4 class="text-sm font-semibold text-[#1c170d] mb-3">Test Papers:</h4>
+                        <div class="space-y-2">
+                            {% for paper in exam.test_papers.all %}
+                            <div class="flex justify-between items-center p-3 bg-[#fcfaf7] rounded border border-[#e8decf] hover:bg-[#f5ede8] transition-colors">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm font-medium text-[#1c170d]">Paper Code: {{ paper.paper_code }}</span>
+                                    <span class="text-xs text-[#616161]">Questions: {{ paper.total_questions }}</span>
+                                    <span class="text-xs px-2 py-1 rounded {% if paper.is_active %}bg-green-100 text-green-700{% else %}bg-gray-100 text-gray-600{% endif %}">
+                                        {% if paper.is_active %}Active{% else %}Inactive{% endif %}
+                                    </span>
+                                </div>
+                                <button onclick="deleteTestPaper({{ paper.id }}, '{{ paper.paper_code|escapejs }}', '{{ exam.name|escapejs }}')" 
+                                        class="text-red-600 hover:text-red-800 text-xs px-3 py-1 bg-white rounded border border-red-200 hover:border-red-600 transition-colors">
+                                    Delete
+                                </button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="p-4 text-center text-sm text-[#616161]">
+                        No test papers uploaded yet.
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
             {% else %}
             <div class="text-center py-12">
@@ -68,6 +111,101 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Success/Error Message Modal -->
+    <div id="messageModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <p id="messageText" class="text-[#1c170d] mb-4"></p>
+            <button onclick="closeMessageModal()" class="w-full bg-[#f2960d] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#c3824e] transition-colors">
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function deleteExam(examId, examName) {
+            if (!confirm(`Are you sure you want to delete the exam "${examName}"?\n\nThis will delete:\n- All test papers\n- All questions\n- All student attempts\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/teacher/api/delete-exam/${examId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showMessage('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Error: ' + error.message, 'error');
+            });
+        }
+
+        function deleteTestPaper(paperId, paperCode, examName) {
+            if (!confirm(`Are you sure you want to delete test paper "${paperCode}" from exam "${examName}"?\n\nThis will delete all questions in this paper.\n\nThis action cannot be undone.`)) {
+                return;
+            }
+
+            fetch(`/teacher/api/delete-test-paper/${paperId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage(data.message, 'success');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showMessage('Error: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Error: ' + error.message, 'error');
+            });
+        }
+
+        function showMessage(message, type) {
+            const modal = document.getElementById('messageModal');
+            const messageText = document.getElementById('messageText');
+            messageText.textContent = message;
+            messageText.className = type === 'success' ? 'text-green-700 mb-4' : 'text-red-700 mb-4';
+            modal.classList.remove('hidden');
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageModal').classList.add('hidden');
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
 </body>
 </html>
 

@@ -396,5 +396,60 @@ class ManageExamsView(LoginRequiredMixin, TemplateView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['exams'] = Exam.objects.all().order_by('-id')
+        context['exams'] = Exam.objects.prefetch_related('test_papers').all().order_by('-id')
         return context
+
+
+@csrf_exempt
+@require_http_methods(["DELETE", "POST"])
+@login_required
+def delete_exam_api(request, exam_id):
+    """API endpoint to delete an exam"""
+    try:
+        # Check if user is a teacher
+        try:
+            request.user.teacherprofile
+        except:
+            return JsonResponse({'success': False, 'error': 'Access denied. Teacher account required.'}, status=403)
+        
+        exam = get_object_or_404(Exam, id=exam_id)
+        
+        # Delete the exam (cascade will delete test papers, questions, and attempts)
+        exam_name = exam.name
+        exam.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Exam "{exam_name}" deleted successfully'
+        })
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["DELETE", "POST"])
+@login_required
+def delete_test_paper_api(request, test_paper_id):
+    """API endpoint to delete a test paper"""
+    try:
+        # Check if user is a teacher
+        try:
+            request.user.teacherprofile
+        except:
+            return JsonResponse({'success': False, 'error': 'Access denied. Teacher account required.'}, status=403)
+        
+        test_paper = get_object_or_404(TestPaper, id=test_paper_id)
+        
+        # Delete the test paper (cascade will delete all questions)
+        paper_code = test_paper.paper_code
+        exam_name = test_paper.exam.name
+        test_paper.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Test paper "{paper_code}" from exam "{exam_name}" deleted successfully'
+        })
+    
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
