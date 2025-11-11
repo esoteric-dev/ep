@@ -281,3 +281,60 @@ def update_profile(request):
         return JsonResponse({'success': True, 'message': 'Profile updated successfully'})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def dashboard_data(request):
+    """Get real-time dashboard data for graphs"""
+    jwt_auth = JWTAuthentication()
+    try:
+        validated_token = jwt_auth.get_validated_token(request.COOKIES.get('jwt', ''))
+        user = jwt_auth.get_user(validated_token)
+    except Exception:
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        user = request.user
+    
+    try:
+        student = user.studentprofile
+        
+        # Get exam attempts ordered by date
+        attempts = ExamAttempt.objects.filter(student=student).order_by('date_taken')
+        
+        # Prepare scores over time data
+        score_labels = []
+        score_data = []
+        for attempt in attempts[:10]:  # Last 10 attempts
+            score_labels.append(attempt.date_taken.strftime('%m/%d'))
+            score_data.append(float(attempt.score))
+        
+        # Get subject/exam distribution data
+        exam_stats = {}
+        for attempt in attempts:
+            exam_name = attempt.exam.name
+            if exam_name not in exam_stats:
+                exam_stats[exam_name] = {'count': 0, 'total_score': 0}
+            exam_stats[exam_name]['count'] += 1
+            exam_stats[exam_name]['total_score'] += float(attempt.score)
+        
+        # Calculate average scores per exam
+        subject_labels = []
+        subject_data = []
+        for exam_name, stats in list(exam_stats.items())[:4]:  # Top 4 exams
+            subject_labels.append(exam_name)
+            avg_score = stats['total_score'] / stats['count']
+            subject_data.append(round(avg_score, 1))
+        
+        return JsonResponse({
+            'scores': {
+                'labels': score_labels,
+                'data': score_data
+            },
+            'subjects': {
+                'labels': subject_labels,
+                'data': subject_data
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)

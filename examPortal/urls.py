@@ -25,11 +25,21 @@ from student.views import DashboardView, custom_logout_view
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from exam.views import LandingPageView
 
+
+class SignupView(TemplateView):
+    template_name = 'signup.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['FIREBASE_CONFIG'] = settings.FIREBASE_CONFIG
+        return context
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', LandingPageView.as_view(), name='landing'),  # Landing page at root
     path('login/', TemplateView.as_view(template_name='login.html'), name='login'),  # Login page
-    path('signup/', TemplateView.as_view(template_name='signup.html'), name='signup'),
+    path('signup/', SignupView.as_view(), name='signup'),
     path('dashboard/', DashboardView.as_view(), name='dashboard'),  # New dashboard route
     path('api/user/register/', UserCreateView.as_view(), name='user-create'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

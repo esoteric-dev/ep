@@ -1,4 +1,30 @@
 (function () {
+    // Firebase configuration - will be loaded from Django settings
+    const firebaseConfig = {
+        apiKey: "{{ FIREBASE_CONFIG.apiKey }}",
+        authDomain: "{{ FIREBASE_CONFIG.authDomain }}",
+        projectId: "{{ FIREBASE_CONFIG.projectId }}",
+        storageBucket: "{{ FIREBASE_CONFIG.storageBucket }}",
+        messagingSenderId: "{{ FIREBASE_CONFIG.messagingSenderId }}",
+        appId: "{{ FIREBASE_CONFIG.appId }}",
+        databaseURL: "{{ FIREBASE_CONFIG.databaseURL }}"
+    };
+
+    // Initialize Firebase only if config is available
+    let firebaseInitialized = false;
+    let auth = null;
+    let recaptchaVerifier = null;
+
+    if (firebaseConfig.apiKey && firebaseConfig.apiKey !== '') {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            firebaseInitialized = true;
+        } catch (error) {
+            console.log('Firebase initialization skipped:', error);
+        }
+    }
+
     function showToast(messages, type = 'error') {
         // Convert single message to array
         const messageArray = Array.isArray(messages) ? messages : [messages];
@@ -76,7 +102,9 @@
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
-    } const form = document.getElementById('signupForm');
+    }
+
+    const form = document.getElementById('signupForm');
     const passwordInput = document.getElementById('password');
     const toggleBtn = document.querySelector('#signupForm .toggle-password');
 
@@ -96,6 +124,50 @@
         });
     }
 
+    // Initialize reCAPTCHA for Firebase phone auth
+    function initializeRecaptcha() {
+        if (!firebaseInitialized || recaptchaVerifier) return;
+        
+        try {
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    // reCAPTCHA solved
+                }
+            });
+        } catch (error) {
+            console.log('reCAPTCHA initialization skipped:', error);
+        }
+    }
+
+    // Send OTP to phone number
+    async function sendOTP(phoneNumber) {
+        if (!firebaseInitialized || !recaptchaVerifier) {
+            return null;
+        }
+
+        try {
+            const confirmationResult = await auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier);
+            return confirmationResult;
+        } catch (error) {
+            console.error('Error sending OTP:', error);
+            throw error;
+        }
+    }
+
+    // Verify OTP
+    async function verifyOTP(confirmationResult, code) {
+        if (!confirmationResult) return null;
+
+        try {
+            const result = await confirmationResult.confirm(code);
+            return result.user;
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+            throw error;
+        }
+    }
+
     if (form) {
         // Add input validation styles
         const inputs = form.querySelectorAll('input[required]');
@@ -108,6 +180,11 @@
                 input.classList.remove('border-red-300');
             });
         });
+
+        // Initialize reCAPTCHA when form is ready
+        if (firebaseInitialized) {
+            setTimeout(initializeRecaptcha, 1000);
+        }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -142,9 +219,49 @@
 
             // Phone validation (if provided)
             if (phone && !/^\+?[\d\s-]{10,}$/.test(phone)) {
-                showToast('Please enter a valid phone number.');
+                showToast('Please enter a valid phone number with country code (e.g., +1234567890).');
                 phoneEl.classList.add('border-red-300');
                 return;
+            }
+
+            // OTP verification flow if Firebase is initialized and phone is provided
+            if (firebaseInitialized && phone && phone.trim()) {
+                try {
+                    // Ensure phone has country code
+                    let formattedPhone = phone.trim();
+                    if (!formattedPhone.startsWith('+')) {
+                        showToast('Please include country code in phone number (e.g., +1 for US).');
+                        phoneEl.classList.add('border-red-300');
+                        return;
+                    }
+
+                    showToast('Sending OTP to your phone...', 'success');
+                    
+                    // Send OTP
+                    const confirmationResult = await sendOTP(formattedPhone);
+                    
+                    if (!confirmationResult) {
+                        throw new Error('Failed to send OTP');
+                    }
+
+                    // Prompt for OTP
+                    const otp = prompt('Enter the OTP sent to your phone:');
+                    
+                    if (!otp) {
+                        showToast('OTP verification cancelled.');
+                        return;
+                    }
+
+                    showToast('Verifying OTP...', 'success');
+                    
+                    // Verify OTP
+                    await verifyOTP(confirmationResult, otp);
+                    
+                    showToast('Phone verified successfully!', 'success');
+                } catch (error) {
+                    console.error('OTP verification error:', error);
+                    showToast('OTP verification failed. Proceeding without phone verification.');
+                }
             }
 
             // Use email as username for simplicity
@@ -206,16 +323,59 @@
                 }
 
                 // Show success message
-                showToast('Account created successfully! Redirecting to login...', 'success');
+                showToast('Account created successfully! Logging you in...', 'success');
 
-                // Redirect to login after a short delay
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 2000);
+                // Auto-login after successful registration
+                try {
+                    const loginRes = await fetch('/api/token/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            username: email,
+                            password: password
+                        })
+                    });
+
+                    if (loginRes.ok) {
+                        const loginData = await loginRes.json();
+                        
+                        // Store tokens
+                        localStorage.setItem('access_token', loginData.access);
+                        localStorage.setItem('refresh_token', loginData.refresh);
+                        
+                        // Set the access token in a cookie for Django authentication
+                        document.cookie = `jwt=${loginData.access}; path=/; sameSite=Lax`;
+
+                        // Redirect to dashboard
+                        setTimeout(() => {
+                            window.location.href = '/dashboard/';
+                        }, 1000);
+                    } else {
+                        // If auto-login fails, redirect to login page
+                        setTimeout(() => {
+                            window.location.href = '/login/';
+                        }, 2000);
+                    }
+                } catch (loginErr) {
+                    console.error('Auto-login error:', loginErr);
+                    // If auto-login fails, redirect to login page
+                    setTimeout(() => {
+                        window.location.href = '/login/';
+                    }, 2000);
+                }
             } catch (err) {
                 console.error(err);
                 showToast('Network error. Please try again.');
             }
         });
+    }
+
+    // Add invisible reCAPTCHA container
+    if (firebaseInitialized) {
+        const recaptchaContainer = document.createElement('div');
+        recaptchaContainer.id = 'recaptcha-container';
+        document.body.appendChild(recaptchaContainer);
     }
 })();
