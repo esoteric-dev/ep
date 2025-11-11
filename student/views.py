@@ -280,7 +280,11 @@ def update_profile(request):
         
         return JsonResponse({'success': True, 'message': 'Profile updated successfully'})
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Profile update error: {str(e)}')
+        return JsonResponse({'error': 'Failed to update profile'}, status=400)
 
 
 @csrf_exempt
@@ -337,4 +341,8 @@ def dashboard_data(request):
             }
         })
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=400)
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f'Dashboard data error: {str(e)}')
+        return JsonResponse({'error': 'Failed to load dashboard data'}, status=400)
