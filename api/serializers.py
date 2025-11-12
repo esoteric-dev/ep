@@ -29,6 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
 		# Basic server-side validation to align with model constraints
 		if len(value) > 15:
 			raise serializers.ValidationError('Phone number must be at most 15 characters.')
+		# Ensure phone number is unique
+		if StudentProfile.objects.filter(phone_number=value).exists():
+			raise serializers.ValidationError('A user with this phone number already exists.')
 		return value
 
 	def validate_email(self, value):

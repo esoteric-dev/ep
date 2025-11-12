@@ -157,6 +157,28 @@ ADSENSE_CLIENT = os.getenv('ADSENSE_CLIENT', '')
 ADSENSE_SLOT_EXAM = os.getenv('ADSENSE_SLOT_EXAM', '')
 ADSENSE_SLOT_RESULTS = os.getenv('ADSENSE_SLOT_RESULTS', '')
 
+# Firebase configuration
+# Add these to your .env file:
+# FIREBASE_API_KEY=your-api-key
+# FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+# FIREBASE_PROJECT_ID=your-project-id
+# FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+# FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+# FIREBASE_APP_ID=your-app-id
+# FIREBASE_DATABASE_URL=https://your-project.firebaseio.com
+FIREBASE_CONFIG = {
+    'apiKey': os.getenv('FIREBASE_API_KEY', ''),
+    'authDomain': os.getenv('FIREBASE_AUTH_DOMAIN', ''),
+    'projectId': os.getenv('FIREBASE_PROJECT_ID', ''),
+    'storageBucket': os.getenv('FIREBASE_STORAGE_BUCKET', ''),
+    'messagingSenderId': os.getenv('FIREBASE_MESSAGING_SENDER_ID', ''),
+    'appId': os.getenv('FIREBASE_APP_ID', ''),
+    'databaseURL': os.getenv('FIREBASE_DATABASE_URL', ''),
+}
+
+# Path to Firebase Admin SDK service account key (optional, for server-side Firebase Admin)
+FIREBASE_ADMIN_CREDENTIAL_PATH = os.getenv('FIREBASE_ADMIN_CREDENTIAL_PATH', '')
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

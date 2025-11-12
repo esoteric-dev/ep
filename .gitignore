@@ -8,3 +8,36 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Firebase credentials
+firebase-admin-key.json
+*firebase*.json
+
+# Database
+*.sqlite3
+db.sqlite3
+
+# Static files
+staticfiles/
+media/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log

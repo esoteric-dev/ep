@@ -26,6 +26,10 @@ function createScoresChart(canvasId, labels, data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            },
             plugins: {
                 legend: {
                     display: false
@@ -83,6 +87,10 @@ function createSubjectChart(canvasId, labels, data) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: {
+                duration: 2000,
+                easing: 'easeInOutQuart'
+            },
             plugins: {
                 legend: {
                     position: 'right',
@@ -101,15 +109,58 @@ function createSubjectChart(canvasId, labels, data) {
     });
 }
 
-// Initialize charts when DOM is loaded
-document.addEventListener('DOMContentLoaded', function () {
-    // Test scores chart data
+// Fetch dashboard data and initialize charts
+async function loadDashboardData() {
+    try {
+        const response = await fetch('/api/dashboard-data/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            console.error('Failed to fetch dashboard data');
+            // Use fallback data if API fails
+            useFallbackData();
+            return;
+        }
+
+        const data = await response.json();
+        
+        // Use real data if available, otherwise use fallback
+        if (data.scores && data.scores.labels.length > 0) {
+            createScoresChart('scoresChart', data.scores.labels, data.scores.data);
+        } else {
+            // Fallback data for scores
+            createScoresChart('scoresChart', ['No Data'], [0]);
+        }
+
+        if (data.subjects && data.subjects.labels.length > 0) {
+            createSubjectChart('subjectChart', data.subjects.labels, data.subjects.data);
+        } else {
+            // Fallback data for subjects
+            createSubjectChart('subjectChart', ['No Data'], [100]);
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        useFallbackData();
+    }
+}
+
+// Fallback function with dummy data
+function useFallbackData() {
     const weekLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
     const scoreData = [75, 82, 68, 90];
     createScoresChart('scoresChart', weekLabels, scoreData);
 
-    // Subject completion chart data
     const subjectLabels = ['Math', 'Science', 'English', 'History'];
     const completionData = [85, 78, 92, 70];
     createSubjectChart('subjectChart', subjectLabels, completionData);
+}
+
+// Initialize charts when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    loadDashboardData();
 });
